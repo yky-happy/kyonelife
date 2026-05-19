@@ -25,5 +25,15 @@ mybatis-plus:
 
 sa-token:
   token-name: Authorization
-  timeout: 2592000   # 30天
+  timeout: 2592000
   is-concurrent: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  packages-to-scan: com.yky.blog
+
+knife4j:
+  enable: true
