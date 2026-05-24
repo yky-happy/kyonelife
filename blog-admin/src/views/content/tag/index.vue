@@ -29,6 +29,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column label="文章数" prop="articleCount" width="100" align="center" />
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
@@ -71,9 +72,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Search, Plus } from '@element-plus/icons-vue'
+import { getTagPage, saveTag, updateTag, deleteTag, type Tag } from '@/api/tag'
 
 const loading = ref(false)
 const saving = ref(false)
@@ -84,13 +86,39 @@ const total = ref(0)
 const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
 
-const tableData = ref<any[]>([])
+const tableData = ref<Tag[]>([])
 
 const form = reactive({ id: null as null | number, name: '', color: '#14b8a6' })
 
 const rules: FormRules = {
   name: [{ required: true, message: '请输入标签名', trigger: 'blur' }],
 }
+
+async function loadData() {
+  loading.value = true
+  try {
+    const res = await getTagPage({
+      page: page.value,
+      size: pageSize.value,
+      keyword: keyword.value || undefined,
+    })
+    tableData.value = res.data.records
+    total.value = res.data.total
+  } finally {
+    loading.value = false
+  }
+}
+
+// 关键字变化时回到第一页重新搜索
+watch(keyword, () => {
+  page.value = 1
+  loadData()
+})
+
+// 翻页或改每页条数时重新加载
+watch([page, pageSize], loadData)
+
+onMounted(loadData)
 
 function openDialog(row?: any) {
   if (row) {
@@ -106,8 +134,16 @@ async function handleSave() {
   await formRef.value?.validate()
   saving.value = true
   try {
-    ElMessage.success(form.id ? '编辑成功' : '新增成功')
+    const dto = { name: form.name, color: form.color }
+    if (form.id) {
+      await updateTag(form.id, dto)
+      ElMessage.success('编辑成功')
+    } else {
+      await saveTag(dto)
+      ElMessage.success('新增成功')
+    }
     dialogVisible.value = false
+    loadData()
   } finally {
     saving.value = false
   }
@@ -115,7 +151,9 @@ async function handleSave() {
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确认删除标签「${row.name}」？`, '提示', { type: 'warning' })
+  await deleteTag(row.id)
   ElMessage.success('删除成功')
+  loadData()
 }
 </script>
 

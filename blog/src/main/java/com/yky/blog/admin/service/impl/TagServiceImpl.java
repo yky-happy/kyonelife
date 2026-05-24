@@ -1,0 +1,56 @@
+package com.yky.blog.admin.service.impl;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yky.blog.admin.dto.TagSaveDTO;
+import com.yky.blog.admin.service.TagService;
+import com.yky.blog.admin.vo.TagVO;
+import com.yky.blog.common.entity.Tag;
+import com.yky.blog.common.exception.BizException;
+import com.yky.blog.common.mapper.TagMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+@Service
+public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
+
+    @Override
+    public IPage<TagVO> pageTag(int page, int size, String keyword) {
+        return baseMapper.selectTagVOPage(new Page<>(page, size), keyword);
+    }
+
+    @Override
+    public Long saveTag(TagSaveDTO dto) {
+        checkNameDuplicate(dto.getName(), null);
+        Tag tag = new Tag();
+        BeanUtils.copyProperties(dto, tag);
+        save(tag);
+        return tag.getId();
+    }
+
+    @Override
+    public void updateTag(Long id, TagSaveDTO dto) {
+        checkNameDuplicate(dto.getName(), id);
+        Tag tag = new Tag();
+        BeanUtils.copyProperties(dto, tag);
+        tag.setId(id);
+        updateById(tag);
+    }
+
+    @Override
+    public void removeTag(Long id) {
+        removeById(id);
+    }
+
+    private void checkNameDuplicate(String name, Long excludeId) {
+        boolean exists = lambdaQuery()
+                .eq(Tag::getName, name)
+                .ne(excludeId != null, Tag::getId, excludeId)
+                .exists();
+        if (exists) {
+            throw new BizException("标签名已存在");
+        }
+    }
+}

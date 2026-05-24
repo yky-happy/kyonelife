@@ -23,7 +23,8 @@
         </el-table-column>
         <el-table-column label="合集名称" prop="name" min-width="160" />
         <el-table-column label="简介" prop="description" min-width="200" show-overflow-tooltip />
-        <el-table-column label="排序" prop="sort" width="80" />
+        <el-table-column label="文章数" prop="articleCount" width="90" align="center" />
+        <el-table-column label="排序" prop="sort" width="80" align="center" />
         <el-table-column label="创建时间" prop="createTime" min-width="180" />
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
@@ -63,9 +64,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { Search, Plus } from '@element-plus/icons-vue'
+import { Search, Plus, Picture } from '@element-plus/icons-vue'
+import { getCollectionPage, saveCollection, updateCollection, deleteCollection, type Collection } from '@/api/collection'
 
 const loading = ref(false)
 const saving = ref(false)
@@ -75,13 +77,34 @@ const pageSize = ref(10)
 const total = ref(0)
 const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
-const tableData = ref<any[]>([])
+const tableData = ref<Collection[]>([])
 
 const form = reactive({ id: null as null | number, name: '', cover: '', description: '', sort: 0 })
 const rules: FormRules = { name: [{ required: true, message: '请输入合集名称', trigger: 'blur' }] }
 
+async function loadData() {
+  loading.value = true
+  try {
+    const res = await getCollectionPage({
+      page: page.value,
+      size: pageSize.value,
+      keyword: keyword.value || undefined,
+    })
+    tableData.value = res.data.records
+    total.value = res.data.total
+  } finally {
+    loading.value = false
+  }
+}
+
+watch(keyword, () => { page.value = 1; loadData() })
+watch([page, pageSize], loadData)
+onMounted(loadData)
+
 function openDialog(row?: any) {
-  row ? Object.assign(form, row) : Object.assign(form, { id: null, name: '', cover: '', description: '', sort: 0 })
+  row
+    ? Object.assign(form, { id: row.id, name: row.name, cover: row.cover, description: row.description, sort: row.sort })
+    : Object.assign(form, { id: null, name: '', cover: '', description: '', sort: 0 })
   formRef.value?.clearValidate()
   dialogVisible.value = true
 }
@@ -89,13 +112,27 @@ function openDialog(row?: any) {
 async function handleSave() {
   await formRef.value?.validate()
   saving.value = true
-  try { ElMessage.success(form.id ? '编辑成功' : '新增成功'); dialogVisible.value = false }
-  finally { saving.value = false }
+  try {
+    const dto = { name: form.name, cover: form.cover, description: form.description, sort: form.sort }
+    if (form.id) {
+      await updateCollection(form.id, dto)
+      ElMessage.success('编辑成功')
+    } else {
+      await saveCollection(dto)
+      ElMessage.success('新增成功')
+    }
+    dialogVisible.value = false
+    loadData()
+  } finally {
+    saving.value = false
+  }
 }
 
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确认删除合集「${row.name}」？`, '提示', { type: 'warning' })
+  await deleteCollection(row.id)
   ElMessage.success('删除成功')
+  loadData()
 }
 </script>
 
