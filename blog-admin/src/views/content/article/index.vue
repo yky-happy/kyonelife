@@ -44,12 +44,14 @@
         </el-table-column>
         <el-table-column label="阅读" prop="viewCount" width="80" />
         <el-table-column label="发布时间" prop="createTime" min-width="160" />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="218" fixed="right">
           <template #default="{ row }">
-            <el-button text type="primary" size="small" @click="goEdit(row)">编辑</el-button>
-            <el-button text :type="row.status === 1 ? 'warning' : 'success'" size="small"
-              @click="toggleStatus(row)">{{ row.status === 1 ? '下架' : '发布' }}</el-button>
-            <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <div class="table-actions article-actions">
+              <el-button text type="primary" size="small" @click="goEdit(row)">编辑</el-button>
+              <el-button text :type="row.status === 1 ? 'warning' : 'success'" size="small"
+                @click="toggleStatus(row)">{{ row.status === 1 ? '下架' : '发布' }}</el-button>
+              <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -63,10 +65,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus } from '@element-plus/icons-vue'
+import { Search, Plus, Picture } from '@element-plus/icons-vue'
+import {
+  deleteArticle,
+  getArticlePage,
+  updateArticleStatus,
+  type Article,
+} from '@/api/article'
 
 const router = useRouter()
 const loading = ref(false)
@@ -75,22 +83,47 @@ const statusFilter = ref<number | null>(null)
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const tableData = ref<any[]>([])
+const tableData = ref<Article[]>([])
 
 function statusText(s: number) { return ['草稿', '已发布', '已下架'][s] ?? '-' }
 function statusType(s: number) { return (['info', 'success', 'danger'] as const)[s] ?? 'info' }
 
 function goWrite() { router.push('/content/article/edit') }
-function goEdit(row: any) { router.push(`/content/article/edit?id=${row.id}`) }
+function goEdit(row: Article) { router.push(`/content/article/edit?id=${row.id}`) }
 
-async function toggleStatus(row: any) {
-  await ElMessageBox.confirm(`确认${row.status === 1 ? '下架' : '发布'}该文章？`, '提示', { type: 'warning' })
-  ElMessage.success('操作成功')
+async function loadData() {
+  loading.value = true
+  try {
+    const res = await getArticlePage({
+      page: page.value,
+      size: pageSize.value,
+      keyword: keyword.value || undefined,
+      status: statusFilter.value ?? undefined,
+    })
+    tableData.value = res.data.records
+    total.value = res.data.total
+  } finally {
+    loading.value = false
+  }
 }
 
-async function handleDelete(row: any) {
+watch(keyword, () => { page.value = 1; loadData() })
+watch(statusFilter, () => { page.value = 1; loadData() })
+watch([page, pageSize], loadData)
+onMounted(loadData)
+
+async function toggleStatus(row: Article) {
+  await ElMessageBox.confirm(`确认${row.status === 1 ? '下架' : '发布'}该文章？`, '提示', { type: 'warning' })
+  await updateArticleStatus(row.id, row.status === 1 ? 2 : 1)
+  ElMessage.success('操作成功')
+  loadData()
+}
+
+async function handleDelete(row: Article) {
   await ElMessageBox.confirm(`确认删除文章「${row.title}」？`, '提示', { type: 'warning' })
+  await deleteArticle(row.id)
   ElMessage.success('删除成功')
+  loadData()
 }
 </script>
 

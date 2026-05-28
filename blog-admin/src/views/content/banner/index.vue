@@ -26,8 +26,10 @@
         </el-table-column>
         <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
-            <el-button text type="primary" size="small" @click="openDialog(row)">编辑</el-button>
-            <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <div class="table-actions">
+              <el-button text type="primary" size="small" @click="openDialog(row)">编辑</el-button>
+              <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

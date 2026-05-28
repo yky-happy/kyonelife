@@ -24,12 +24,14 @@
           </template>
         </el-table-column>
         <el-table-column label="评论时间" prop="createTime" min-width="160" />
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button text :type="row.status === 1 ? 'warning' : 'success'" size="small" @click="toggleStatus(row)">
-              {{ row.status === 1 ? '隐藏' : '显示' }}
-            </el-button>
-            <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <div class="table-actions">
+              <el-button text :type="row.status === 1 ? 'warning' : 'success'" size="small" @click="toggleStatus(row)">
+                {{ row.status === 1 ? '隐藏' : '显示' }}
+              </el-button>
+              <el-button text type="danger" size="small" @click="handleDelete">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -60,7 +62,7 @@ async function toggleStatus(row: any) {
   ElMessage.success('操作成功')
 }
 
-async function handleDelete(row: any) {
+async function handleDelete() {
   await ElMessageBox.confirm('确认删除该评论？此操作不可撤销', '提示', { type: 'warning' })
   ElMessage.success('删除成功')
 }

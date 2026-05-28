@@ -13,17 +13,54 @@ request.interceptors.request.use((config) => {
   if (auth.token) {
     config.headers['Authorization'] = auth.token
   }
+  if (import.meta.env.DEV) {
+    console.debug('[API Request]', {
+      method: config.method?.toUpperCase(),
+      url: config.url,
+      params: config.params,
+      data: config.data,
+    })
+  }
   return config
 })
 
 request.interceptors.response.use(
   (res) => {
     const data = res.data
-    if (data.code === 200) return data
+    if (data.code === 200) {
+      if (import.meta.env.DEV) {
+        console.debug('[API Response]', {
+          method: res.config.method?.toUpperCase(),
+          url: res.config.url,
+          data,
+        })
+      }
+      return data
+    }
+    if (import.meta.env.DEV) {
+      console.error('[API Business Error]', {
+        method: res.config.method?.toUpperCase(),
+        url: res.config.url,
+        params: res.config.params,
+        requestData: res.config.data,
+        response: data,
+      })
+    }
     ElMessage.error(data.message || '请求失败')
     return Promise.reject(data)
   },
   (err) => {
+    if (import.meta.env.DEV) {
+      console.error('[API Network Error]', {
+        method: err.config?.method?.toUpperCase(),
+        url: err.config?.url,
+        params: err.config?.params,
+        requestData: err.config?.data,
+        status: err.response?.status,
+        response: err.response?.data,
+        message: err.message,
+      })
+    }
     if (err.response?.status === 401) {
       useAuthStore().clearAuth()
       router.push('/login')

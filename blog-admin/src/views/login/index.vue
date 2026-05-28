@@ -3,7 +3,7 @@
     <div class="login-left">
       <div class="brand">
         <div class="brand-icon">
-          <el-icon :size="28" color="#14b8a6"><EditPen /></el-icon>
+          <el-icon :size="28" color="#ffffff"><EditPen /></el-icon>
         </div>
         <h1 class="brand-name">kyonelife</h1>
         <p class="brand-desc">个人博客管理系统</p>
@@ -112,12 +112,16 @@ async function handleLogin() {
 .login-page {
   display: flex;
   height: 100vh;
-  background: var(--main-bg);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.82), rgba(240,246,253,.72)),
+    var(--main-bg);
 }
 
 .login-left {
   flex: 1;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #134e4a 100%);
+  background:
+    linear-gradient(135deg, rgba(47,109,246,.92), rgba(21,184,166,.9)),
+    #2f6df6;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -130,12 +134,11 @@ async function handleLogin() {
 .login-left::before {
   content: '';
   position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(20,184,166,0.15) 0%, transparent 70%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,.1) 1px, transparent 1px);
+  background-size: 44px 44px;
   pointer-events: none;
 }
 
@@ -147,9 +150,9 @@ async function handleLogin() {
 .brand-icon {
   width: 64px;
   height: 64px;
-  background: rgba(20,184,166,0.15);
-  border: 1px solid rgba(20,184,166,0.3);
-  border-radius: 16px;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -160,14 +163,14 @@ async function handleLogin() {
   font-size: 32px;
   font-weight: 800;
   color: #f8fafc;
-  letter-spacing: -1px;
+  letter-spacing: 0;
   margin-bottom: 8px;
 }
 
 .brand-desc {
   font-size: 14px;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 1px;
+  color: rgba(255,255,255,0.72);
+  letter-spacing: 0;
 }
 
 .decoration {
@@ -178,9 +181,9 @@ async function handleLogin() {
 }
 
 .deco-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
   padding: 12px 16px;
   display: flex;
   align-items: center;
@@ -217,7 +220,8 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   padding: 60px;
-  background: #fff;
+  background: rgba(255, 255, 255, .82);
+  backdrop-filter: blur(18px);
 }
 
 .login-box {
@@ -226,9 +230,9 @@ async function handleLogin() {
 }
 
 .login-title {
-  font-size: 26px;
-  font-weight: 700;
-  color: #111827;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-main);
   margin-bottom: 6px;
 }
 
@@ -245,30 +249,29 @@ async function handleLogin() {
 }
 
 .custom-input :deep(.el-input__wrapper) {
-  border-radius: 8px;
-  box-shadow: 0 0 0 1px #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--border);
   padding: 0 14px;
 }
 
 .custom-input :deep(.el-input__wrapper:hover),
 .custom-input :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 2px #14b8a6 !important;
+  box-shadow: 0 0 0 1px var(--primary) inset, var(--ring) !important;
 }
 
 .login-btn {
   width: 100%;
   height: 44px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 15px;
   font-weight: 600;
-  background: #14b8a6;
-  border-color: #14b8a6;
+  background: linear-gradient(135deg, #2f6df6 0%, #15b8a6 100%);
+  border: none;
   margin-top: 8px;
-  letter-spacing: 4px;
+  letter-spacing: 0;
 }
 
 .login-btn:hover {
-  background: #0d9488;
-  border-color: #0d9488;
+  filter: brightness(1.03);
 }
 </style>

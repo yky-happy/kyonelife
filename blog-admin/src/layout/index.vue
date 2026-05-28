@@ -20,7 +20,9 @@ import Header from './components/Header.vue'
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background: var(--main-bg);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.72), rgba(243,247,252,.58)),
+    var(--main-bg);
 }
 
 .layout-main {
@@ -33,6 +35,6 @@ import Header from './components/Header.vue'
 .layout-content {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 22px 24px 28px;
 }
 </style>

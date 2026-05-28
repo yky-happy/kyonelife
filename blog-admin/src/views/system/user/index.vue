@@ -24,12 +24,14 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="140" fixed="right">
+        <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button text :type="row.status === 1 ? 'warning' : 'success'" size="small" @click="toggleStatus(row)">
-              {{ row.status === 1 ? '封禁' : '解封' }}
-            </el-button>
-            <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <div class="table-actions">
+              <el-button text :type="row.status === 1 ? 'warning' : 'success'" size="small" @click="toggleStatus(row)">
+                {{ row.status === 1 ? '封禁' : '解封' }}
+              </el-button>
+              <el-button text type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>

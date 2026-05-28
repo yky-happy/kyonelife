@@ -2,11 +2,11 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">
-        <el-icon :size="22" color="#14b8a6"><EditPen /></el-icon>
+        <el-icon :size="22" color="#ffffff"><EditPen /></el-icon>
       </div>
       <div class="logo-text">
         <span class="logo-title">kyonelife</span>
-        <span class="logo-sub">博客管理</span>
+        <span class="logo-sub">Content Studio</span>
       </div>
     </div>
 
@@ -72,31 +72,32 @@ function isActive(path: string) {
   width: var(--sidebar-width);
   height: 100vh;
   background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid rgba(232, 237, 246, .82);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   overflow-y: auto;
+  box-shadow: 18px 0 50px rgba(20, 32, 51, .05);
+  backdrop-filter: blur(18px);
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--border);
+  padding: 18px 14px 16px;
 }
 
 .logo-icon {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #2f6df6 0%, #15b8a6 100%);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid #99f6e4;
+  box-shadow: 0 14px 28px rgba(47, 109, 246, .22);
 }
 
 .logo-text {
@@ -105,20 +106,21 @@ function isActive(path: string) {
 }
 
 .logo-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #111827;
-  letter-spacing: -0.3px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: 0;
 }
 
 .logo-sub {
+  margin-top: 2px;
   font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
+  color: #6f7f96;
+  letter-spacing: 0;
 }
 
 .sidebar-nav {
-  padding: 12px 12px 20px;
+  padding: 8px 14px 20px;
   flex: 1;
 }
 
@@ -127,30 +129,30 @@ function isActive(path: string) {
 }
 
 .nav-group-label {
-  font-size: 10.5px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 14px 8px 6px;
+  letter-spacing: 0;
+  padding: 16px 8px 7px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 12px;
-  border-radius: 8px;
-  color: #6b7280;
+  min-height: 38px;
+  padding: 9px 11px;
+  border-radius: 11px;
+  color: #64728a;
   text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 500;
-  transition: all 0.15s ease;
-  margin-bottom: 2px;
+  font-size: 13px;
+  font-weight: 650;
+  transition: all 0.18s ease;
+  margin-bottom: 3px;
 }
 
 .nav-item:hover {
-  background: var(--primary-light);
+  background: rgba(47, 109, 246, .08);
   color: var(--primary-hover);
 }
 
@@ -161,6 +163,7 @@ function isActive(path: string) {
 .nav-item.active {
   background: var(--active-bg);
   color: var(--active-text);
+  box-shadow: 0 12px 26px rgba(47, 109, 246, .22);
 }
 
 .nav-item.active .el-icon {

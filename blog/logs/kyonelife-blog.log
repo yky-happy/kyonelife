@@ -1,0 +1,14 @@
+2026-05-28 11:35:54.239 INFO  [main] com.yky.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 21.0.6 with PID 1629208 (started by yky in /mnt/data/yky/codes/kyonelife/blog)
+2026-05-28 11:35:54.240 DEBUG [main] com.yky.blog.BlogApplicationTests - Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-05-28 11:35:54.241 INFO  [main] com.yky.blog.BlogApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-05-28 11:35:55.134 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-28 11:35:55.137 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-28 11:35:55.170 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 17 ms. Found 0 Redis repository interfaces.
+2026-05-28 11:35:57.564 INFO  [main] com.yky.blog.BlogApplicationTests - Started BlogApplicationTests in 3.677 seconds (process running for 4.779)
+2026-05-28 17:18:18.218 INFO  [main] com.yky.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 21.0.6 with PID 1792974 (started by yky in /mnt/data/yky/codes/kyonelife/blog)
+2026-05-28 17:18:18.219 DEBUG [main] com.yky.blog.BlogApplicationTests - Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-05-28 17:18:18.220 INFO  [main] com.yky.blog.BlogApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-05-28 17:18:19.190 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-05-28 17:18:19.193 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-05-28 17:18:19.227 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 17 ms. Found 0 Redis repository interfaces.
+2026-05-28 17:18:21.872 INFO  [main] com.yky.blog.BlogApplicationTests - Started BlogApplicationTests in 4.019 seconds (process running for 5.041)

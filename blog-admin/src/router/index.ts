@@ -15,6 +15,7 @@ const router = createRouter({
       children: [
         { path: 'dashboard', component: () => import('@/views/dashboard/index.vue') },
         { path: 'content/article', component: () => import('@/views/content/article/index.vue') },
+        { path: 'content/article/edit', component: () => import('@/views/content/article/edit.vue') },
         { path: 'content/collection', component: () => import('@/views/content/collection/index.vue') },
         { path: 'content/tag', component: () => import('@/views/content/tag/index.vue') },
         { path: 'content/comment', component: () => import('@/views/content/comment/index.vue') },

@@ -42,6 +42,7 @@ const nickname = computed(() => auth.nickname || '管理员')
 const titleMap: Record<string, { group: string; title: string }> = {
   '/dashboard':           { group: '概览',     title: '仪表盘' },
   '/content/article':     { group: '内容管理', title: '文章管理' },
+  '/content/article/edit': { group: '内容管理', title: '写文章' },
   '/content/collection':  { group: '内容管理', title: '合集管理' },
   '/content/tag':         { group: '内容管理', title: '标签管理' },
   '/content/comment':     { group: '内容管理', title: '评论管理' },
@@ -68,13 +69,14 @@ async function handleCommand(cmd: string) {
 <style scoped>
 .header {
   height: var(--header-height);
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, .72);
+  border-bottom: 1px solid rgba(232, 237, 246, .8);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 24px 0 22px;
   flex-shrink: 0;
+  backdrop-filter: blur(18px);
 }
 
 .breadcrumb {
@@ -86,12 +88,13 @@ async function handleCommand(cmd: string) {
 .breadcrumb-root {
   font-size: 13px;
   color: var(--text-muted);
+  font-weight: 600;
 }
 
 .breadcrumb-current {
-  font-size: 13px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
 }
 
 .user-info {
@@ -99,19 +102,23 @@ async function handleCommand(cmd: string) {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 8px;
-  transition: background 0.15s;
+  padding: 7px 10px 7px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(20, 32, 51, .06);
+  transition: all 0.16s;
 }
 
 .user-info:hover {
-  background: var(--main-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(20, 32, 51, .09);
 }
 
 .avatar {
   width: 30px;
   height: 30px;
-  background: linear-gradient(135deg, #14b8a6, #0ea5e9);
+  background: linear-gradient(135deg, #2f6df6, #15b8a6);
   border-radius: 50%;
   color: #fff;
   font-size: 13px;

@@ -37,3 +37,13 @@ springdoc:
 
 knife4j:
   enable: true
+
+logging:
+  file:
+    name: logs/kyonelife-blog.log
+  level:
+    root: info
+    com.yky.blog: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} - %msg%n"

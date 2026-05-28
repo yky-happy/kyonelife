@@ -70,24 +70,25 @@
 
 <script setup lang="ts">
 const stats = [
-  { label: '文章总数',  value: '--', icon: 'Document',     color: '#14b8a6', bg: '#f0fdfa', trend: 0 },
-  { label: '标签数量',  value: '--', icon: 'PriceTag',     color: '#8b5cf6', bg: '#f5f3ff', trend: 0 },
-  { label: '评论总数',  value: '--', icon: 'ChatDotRound', color: '#f59e0b', bg: '#fffbeb', trend: 0 },
-  { label: '注册用户',  value: '--', icon: 'User',         color: '#3b82f6', bg: '#eff6ff', trend: 0 },
+  { label: '文章总数',  value: '--', icon: 'Document',     color: '#2f6df6', bg: '#eef5ff', trend: 0 },
+  { label: '标签数量',  value: '--', icon: 'PriceTag',     color: '#15b8a6', bg: '#ecfdf8', trend: 0 },
+  { label: '评论总数',  value: '--', icon: 'ChatDotRound', color: '#ff8a5b', bg: '#fff3ec', trend: 0 },
+  { label: '注册用户',  value: '--', icon: 'User',         color: '#7c6df2', bg: '#f3f1ff', trend: 0 },
 ]
 </script>
 
 <style scoped>
-.dashboard { display: flex; flex-direction: column; gap: 20px; }
+.dashboard { display: flex; flex-direction: column; gap: 18px; }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
 }
 
 .stat-card {
   background: var(--card-bg);
+  border: 1px solid rgba(232, 237, 246, .88);
   border-radius: var(--radius);
   padding: 20px;
   box-shadow: var(--shadow);
@@ -100,7 +101,7 @@ const stats = [
 .stat-icon {
   width: 46px;
   height: 46px;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,8 +112,8 @@ const stats = [
 
 .stat-value {
   font-size: 24px;
-  font-weight: 700;
-  color: #111827;
+  font-weight: 800;
+  color: var(--text-main);
   line-height: 1;
   margin-bottom: 4px;
 }
@@ -120,6 +121,7 @@ const stats = [
 .stat-label {
   font-size: 12.5px;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .stat-trend {
@@ -135,7 +137,7 @@ const stats = [
 }
 
 .stat-trend.up   { background: #f0fdf4; color: #16a34a; }
-.stat-trend.flat { background: #f9fafb; color: #9ca3af; }
+.stat-trend.flat { background: #f5f8fc; color: #8a97ad; }
 
 .cards-row {
   display: grid;
@@ -145,6 +147,7 @@ const stats = [
 
 .card {
   background: var(--card-bg);
+  border: 1px solid rgba(232, 237, 246, .88);
   border-radius: var(--radius);
   padding: 20px 24px;
   box-shadow: var(--shadow);
@@ -157,9 +160,9 @@ const stats = [
 }
 
 .card-header h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
 }
 
 .quick-actions {
@@ -173,8 +176,9 @@ const stats = [
   align-items: center;
   gap: 10px;
   padding: 12px 14px;
-  border-radius: 8px;
-  background: var(--main-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #f8fbff;
   text-decoration: none;
   color: var(--text);
   font-size: 13.5px;
@@ -183,7 +187,7 @@ const stats = [
 }
 
 .quick-btn:hover {
-  background: #f0fdfa;
+  background: #eef5ff;
   color: var(--primary-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow);
@@ -204,7 +208,7 @@ const stats = [
 
 .sys-key { color: var(--text-muted); }
 
-.sys-val { font-weight: 500; color: #111827; }
+.sys-val { font-weight: 650; color: var(--text-main); }
 
 .sys-link {
   color: var(--primary);
@@ -213,4 +217,8 @@ const stats = [
 }
 
 .sys-link:hover { color: var(--primary-hover); }
+
+@media (max-width: 960px) {
+  .cards-row { grid-template-columns: 1fr; }
+}
 </style>
