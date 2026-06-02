@@ -1,10 +1,10 @@
 -- =========================================================
 -- 博客系统数据库初始化脚本
--- 数据库：kyonelife_blog
+-- 数据库：kyonelife
 -- =========================================================
 
 CREATE DATABASE IF NOT EXISTS kyonelife DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE kyonelife_blog;
+USE kyonelife;
 
 -- ---------------------------------------------------------
 -- 1. 前台用户表（手机号验证码登录）
