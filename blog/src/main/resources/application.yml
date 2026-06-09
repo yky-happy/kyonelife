@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: blog
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 110MB
   datasource:
     url: jdbc:mysql://localhost:3306/kyonelife?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: root
@@ -37,6 +41,34 @@ springdoc:
 
 knife4j:
   enable: true
+
+minio:
+  endpoint: http://localhost:9000
+  public-endpoint: http://localhost:9000
+  access-key: kyonelife
+  secret-key: kyonelife123456
+  bucket: kyonelife
+  image-max-size: 5242880
+  video-max-size: 104857600
+  allowed-image-extensions:
+    - jpg
+    - jpeg
+    - png
+    - webp
+    - gif
+  allowed-image-content-types:
+    - image/jpeg
+    - image/png
+    - image/webp
+    - image/gif
+  allowed-video-extensions:
+    - mp4
+    - webm
+    - mov
+  allowed-video-content-types:
+    - video/mp4
+    - video/webm
+    - video/quicktime
 
 logging:
   file:

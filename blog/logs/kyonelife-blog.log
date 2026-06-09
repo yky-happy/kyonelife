@@ -213,3 +213,24 @@
 2026-06-02 15:13:53.888 INFO  [http-nio-8080-exec-6] com.yky.blog.common.config.RequestLogFilter - HTTP GET /api/article/page?page=1&size=8 -> 200 (22 ms, ip=127.0.0.1)
 2026-06-02 15:15:00.622 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2026-06-02 15:15:00.626 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-06-02 21:17:22.339 INFO  [main] com.yky.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 21.0.6 with PID 777465 (started by yky in /mnt/data/yky/codes/kyonelife/blog)
+2026-06-02 21:17:22.341 DEBUG [main] com.yky.blog.BlogApplicationTests - Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-06-02 21:17:22.342 INFO  [main] com.yky.blog.BlogApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:17:23.322 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:17:23.325 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-06-02 21:17:23.361 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18 ms. Found 0 Redis repository interfaces.
+2026-06-02 21:17:26.635 INFO  [main] com.yky.blog.BlogApplicationTests - Started BlogApplicationTests in 4.668 seconds (process running for 5.724)
+2026-06-02 21:51:23.502 INFO  [main] com.yky.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 21.0.6 with PID 817907 (started by yky in /mnt/data/yky/codes/kyonelife/blog)
+2026-06-02 21:51:23.503 DEBUG [main] com.yky.blog.BlogApplicationTests - Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-06-02 21:51:23.504 INFO  [main] com.yky.blog.BlogApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 21:51:24.544 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 21:51:24.548 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-06-02 21:51:24.585 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18 ms. Found 0 Redis repository interfaces.
+2026-06-02 21:51:27.856 INFO  [main] com.yky.blog.BlogApplicationTests - Started BlogApplicationTests in 4.752 seconds (process running for 5.869)
+2026-06-02 22:07:03.938 INFO  [main] com.yky.blog.BlogApplicationTests - Starting BlogApplicationTests using Java 21.0.6 with PID 850359 (started by yky in /mnt/data/yky/codes/kyonelife/blog)
+2026-06-02 22:07:03.940 DEBUG [main] com.yky.blog.BlogApplicationTests - Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-06-02 22:07:03.941 INFO  [main] com.yky.blog.BlogApplicationTests - No active profile set, falling back to 1 default profile: "default"
+2026-06-02 22:07:04.981 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-06-02 22:07:04.984 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-06-02 22:07:05.017 INFO  [main] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
+2026-06-02 22:07:08.658 INFO  [main] com.yky.blog.BlogApplicationTests - Started BlogApplicationTests in 5.164 seconds (process running for 6.168)

@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getTagList } from '../../api/tag'
 import type { TagItem } from '../../api/types'
+import { trackEvent } from '../../utils/tracker'
 
 const tags = ref<TagItem[]>([])
 const loading = ref(false)
@@ -41,6 +42,7 @@ onMounted(loadTags)
         :to="`/tag/${tag.id}`"
         class="tag-bubble"
         :style="{ '--tag-color': tag.color || '#6bbf8a' }"
+        @click="trackEvent('tag_click', { tagId: tag.id, pageUrl: `/tag/${tag.id}` })"
       >
         <strong>{{ tag.name }}</strong>
         <span>{{ tag.articleCount }} 篇文章</span>

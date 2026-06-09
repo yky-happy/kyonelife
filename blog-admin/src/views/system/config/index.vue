@@ -48,7 +48,21 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="作者头像">
-                <el-input v-model="form.authorAvatar" placeholder="头像图片 URL" />
+                <div class="avatar-upload">
+                  <el-avatar :size="64" :src="form.authorAvatar">
+                    {{ form.author ? form.author.slice(0, 1) : 'A' }}
+                  </el-avatar>
+                  <div class="avatar-actions">
+                    <el-upload
+                      :show-file-list="false"
+                      :http-request="handleAuthorAvatarUpload"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                    >
+                      <el-button :loading="avatarUploading" :icon="Upload">上传头像</el-button>
+                    </el-upload>
+                    <el-input v-model="form.authorAvatar" placeholder="上传后自动回填，也可手动填写头像 URL" />
+                  </div>
+                </div>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -98,9 +112,12 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, type UploadRequestOptions } from 'element-plus'
+import { Upload } from '@element-plus/icons-vue'
+import { uploadImage } from '@/api/file'
 
 const saving = ref(false)
+const avatarUploading = ref(false)
 
 const form = reactive({
   siteName: '', logo: '', summary: '', author: '', authorAvatar: '',
@@ -117,6 +134,17 @@ async function handleSave() {
     saving.value = false
   }
 }
+
+async function handleAuthorAvatarUpload(options: UploadRequestOptions) {
+  avatarUploading.value = true
+  try {
+    const res = await uploadImage(options.file, 'avatar')
+    form.authorAvatar = res.data.url
+    ElMessage.success('头像上传成功')
+  } finally {
+    avatarUploading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -127,4 +155,16 @@ async function handleSave() {
 .config-form { max-width: 900px; }
 .section { margin-bottom: 28px; }
 .section-title { font-size: 12.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+.avatar-actions {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+}
 </style>

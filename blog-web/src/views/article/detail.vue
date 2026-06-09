@@ -5,6 +5,7 @@ import { getArticleDetail } from '../../api/article'
 import type { ArticleDetail } from '../../api/types'
 import { formatDate, readingLabel } from '../../utils/format'
 import { renderMarkdown } from '../../utils/markdown'
+import { trackEvent } from '../../utils/tracker'
 
 const route = useRoute()
 const article = ref<ArticleDetail | null>(null)
@@ -18,6 +19,7 @@ async function loadDetail() {
   error.value = ''
   try {
     article.value = await getArticleDetail(articleId.value)
+    trackEvent('article_view', { articleId: articleId.value })
   } catch (err) {
     error.value = err instanceof Error ? err.message : '文章加载失败'
   } finally {

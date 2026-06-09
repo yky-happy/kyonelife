@@ -115,6 +115,7 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `type`, `path`, `component`, `pe
 (22, 2, '菜单管理',   'MENU',  '/system/menu',        'system/menu/index',        NULL,             3),
 (23, 2, '用户管理',   'MENU',  '/system/user',        'system/user/index',        NULL,             4),
 (24, 2, '网站配置',   'MENU',  '/system/config',      'system/config/index',      NULL,             5),
+(25, 2, '操作日志',   'MENU',  '/system/operation-log','system/operation-log/index',NULL,            6),
 -- 文章管理按钮
 (100, 10, '文章列表', 'BUTTON', NULL, NULL, 'article:list',   1),
 (101, 10, '新增文章', 'BUTTON', NULL, NULL, 'article:add',    2),
@@ -153,7 +154,9 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `type`, `path`, `component`, `pe
 -- 用户管理按钮
 (230, 23, '用户列表', 'BUTTON', NULL, NULL, 'user:list',   1),
 (231, 23, '封禁用户', 'BUTTON', NULL, NULL, 'user:ban',    2),
-(232, 23, '删除用户', 'BUTTON', NULL, NULL, 'user:delete', 3);
+(232, 23, '删除用户', 'BUTTON', NULL, NULL, 'user:delete', 3),
+-- 操作日志按钮
+(250, 25, '操作日志列表', 'BUTTON', NULL, NULL, 'operation-log:list', 1);
 
 -- ---------------------------------------------------------
 -- 6. 角色菜单关联表
@@ -316,3 +319,57 @@ CREATE TABLE `web_config` (
 ) COMMENT '网站配置表（仅一行）';
 
 INSERT INTO `web_config` (`site_name`) VALUES ('kyonelife');
+
+-- ---------------------------------------------------------
+-- 15. 后台操作日志表
+-- ---------------------------------------------------------
+CREATE TABLE `operation_log` (
+  `id`               bigint        NOT NULL AUTO_INCREMENT,
+  `admin_id`         bigint        DEFAULT NULL             COMMENT '管理员ID',
+  `admin_name`       varchar(50)   DEFAULT NULL             COMMENT '管理员名称',
+  `module`           varchar(50)   NOT NULL                 COMMENT '操作模块',
+  `operation`        varchar(50)   NOT NULL                 COMMENT '操作类型',
+  `request_method`   varchar(10)   DEFAULT NULL             COMMENT '请求方法',
+  `request_path`     varchar(255)  DEFAULT NULL             COMMENT '请求路径',
+  `request_params`   text          DEFAULT NULL             COMMENT '请求参数，敏感字段脱敏',
+  `response_code`    int           DEFAULT NULL             COMMENT '响应编码',
+  `response_message` varchar(200)  DEFAULT NULL             COMMENT '响应消息',
+  `ip`               varchar(50)   DEFAULT NULL             COMMENT '请求IP',
+  `user_agent`       varchar(2000) DEFAULT NULL             COMMENT 'User-Agent',
+  `cost_time`        bigint        DEFAULT NULL             COMMENT '接口耗时，毫秒',
+  `success`          tinyint       NOT NULL DEFAULT 1       COMMENT '0=失败 1=成功',
+  `error_message`    text          DEFAULT NULL             COMMENT '异常信息',
+  `create_time`      datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_admin_id` (`admin_id`),
+  KEY `idx_module` (`module`),
+  KEY `idx_success` (`success`),
+  KEY `idx_create_time` (`create_time`)
+) COMMENT '后台操作日志表';
+
+-- ---------------------------------------------------------
+-- 16. 前台行为埋点明细表
+-- ---------------------------------------------------------
+CREATE TABLE `event_log` (
+  `id`            bigint        NOT NULL AUTO_INCREMENT,
+  `event_type`    varchar(50)   NOT NULL                 COMMENT '事件类型：page_view/article_view/tag_click/collection_click/search',
+  `visitor_id`    varchar(100)  NOT NULL                 COMMENT '游客唯一标识',
+  `article_id`    bigint        DEFAULT NULL             COMMENT '文章ID',
+  `tag_id`        bigint        DEFAULT NULL             COMMENT '标签ID',
+  `collection_id` bigint        DEFAULT NULL             COMMENT '合集ID',
+  `keyword`       varchar(200)  DEFAULT NULL             COMMENT '搜索关键词',
+  `page_url`      varchar(500)  DEFAULT NULL             COMMENT '当前页面',
+  `referrer`      varchar(500)  DEFAULT NULL             COMMENT '来源页面',
+  `ip`            varchar(50)   DEFAULT NULL             COMMENT '访问IP',
+  `user_agent`    varchar(1000) DEFAULT NULL             COMMENT 'User-Agent',
+  `device`        varchar(50)   DEFAULT NULL             COMMENT '设备类型',
+  `browser`       varchar(100)  DEFAULT NULL             COMMENT '浏览器',
+  `os`            varchar(100)  DEFAULT NULL             COMMENT '操作系统',
+  `duration`      bigint        DEFAULT 0                COMMENT '停留时长，毫秒',
+  `create_time`   datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_event_type` (`event_type`),
+  KEY `idx_visitor_time` (`visitor_id`, `create_time`),
+  KEY `idx_article_time` (`article_id`, `create_time`),
+  KEY `idx_create_time` (`create_time`)
+) COMMENT '前台行为埋点明细表';

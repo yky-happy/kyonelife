@@ -6,6 +6,7 @@ import com.yky.blog.admin.dto.ArticleStatusDTO;
 import com.yky.blog.admin.service.ArticleService;
 import com.yky.blog.admin.vo.ArticleDetailVO;
 import com.yky.blog.admin.vo.ArticleVO;
+import com.yky.blog.common.annotation.OperationLogRecord;
 import com.yky.blog.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,12 +38,14 @@ public class ArticleController {
     }
 
     @Operation(summary = "新增文章")
+    @OperationLogRecord(module = "文章管理", operation = "新增文章")
     @PostMapping
     public Result<Long> save(@Valid @RequestBody ArticleSaveDTO dto) {
         return Result.success(articleService.saveArticle(dto));
     }
 
     @Operation(summary = "编辑文章")
+    @OperationLogRecord(module = "文章管理", operation = "编辑文章")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody ArticleSaveDTO dto) {
         articleService.updateArticle(id, dto);
@@ -50,6 +53,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "更新文章状态")
+    @OperationLogRecord(module = "文章管理", operation = "更新文章状态")
     @PatchMapping("/{id}/status")
     public Result<Void> updateStatus(@PathVariable Long id, @Valid @RequestBody ArticleStatusDTO dto) {
         articleService.updateArticleStatus(id, dto.getStatus());
@@ -57,6 +61,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "删除文章")
+    @OperationLogRecord(module = "文章管理", operation = "删除文章")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {
         articleService.removeArticle(id);

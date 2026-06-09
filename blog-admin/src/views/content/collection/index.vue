@@ -48,7 +48,18 @@
           <el-input v-model="form.name" placeholder="请输入合集名称" maxlength="50" show-word-limit />
         </el-form-item>
         <el-form-item label="封面">
-          <el-input v-model="form.cover" placeholder="图片地址（暂时手动填写）" />
+          <div class="cover-upload">
+            <el-image v-if="form.cover" :src="form.cover" class="cover-preview" fit="cover" />
+            <div v-else class="cover-empty">暂无封面</div>
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleCoverUpload"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+            >
+              <el-button :loading="uploading" :icon="Upload">上传封面</el-button>
+            </el-upload>
+            <el-input v-model="form.cover" placeholder="上传后自动回填，也可手动填写图片 URL" />
+          </div>
         </el-form-item>
         <el-form-item label="简介">
           <el-input v-model="form.description" type="textarea" :rows="3" placeholder="合集简介" maxlength="200" show-word-limit />
@@ -67,12 +78,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { Search, Plus, Picture } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules, type UploadRequestOptions } from 'element-plus'
+import { Search, Plus, Picture, Upload } from '@element-plus/icons-vue'
 import { getCollectionPage, saveCollection, updateCollection, deleteCollection, type Collection } from '@/api/collection'
+import { uploadImage } from '@/api/file'
 
 const loading = ref(false)
 const saving = ref(false)
+const uploading = ref(false)
 const keyword = ref('')
 const page = ref(1)
 const pageSize = ref(10)
@@ -130,6 +143,17 @@ async function handleSave() {
   }
 }
 
+async function handleCoverUpload(options: UploadRequestOptions) {
+  uploading.value = true
+  try {
+    const res = await uploadImage(options.file, 'collection')
+    form.cover = res.data.url
+    ElMessage.success('封面上传成功')
+  } finally {
+    uploading.value = false
+  }
+}
+
 async function handleDelete(row: any) {
   await ElMessageBox.confirm(`确认删除合集「${row.name}」？`, '提示', { type: 'warning' })
   await deleteCollection(row.id)
@@ -146,4 +170,20 @@ async function handleDelete(row: any) {
 .pagination { display: flex; justify-content: flex-end; margin-top: 18px; }
 .img-placeholder { width: 48px; height: 36px; border-radius: 6px; background: var(--main-bg); display: flex; align-items: center; justify-content: center; }
 .dialog-form { padding: 8px 0; }
+.cover-upload { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.cover-preview,
+.cover-empty {
+  width: 100%;
+  height: 132px;
+  border-radius: 8px;
+  border: 1px solid rgba(232, 237, 246, .88);
+}
+.cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--main-bg);
+  color: var(--text-muted);
+  font-size: 13px;
+}
 </style>

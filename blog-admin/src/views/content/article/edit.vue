@@ -31,11 +31,21 @@
           </el-form-item>
 
           <el-form-item label="正文" prop="contentMd">
+            <div class="editor-tools">
+              <el-upload
+                :show-file-list="false"
+                :http-request="handleVideoUpload"
+                accept="video/mp4,video/webm,video/quicktime"
+              >
+                <el-button :loading="videoUploading" :icon="VideoPlay">上传视频并插入正文</el-button>
+              </el-upload>
+            </div>
             <MdEditor
               v-model="form.contentMd"
               placeholder="请输入 Markdown 原文"
               :toolbars-exclude="['github']"
               class="markdown-editor"
+              @onUploadImg="handleMarkdownImageUpload"
             />
           </el-form-item>
         </el-form>
@@ -43,8 +53,19 @@
 
       <div class="side-panel">
         <el-form label-position="top">
-          <el-form-item label="封面图地址">
-            <el-input v-model="form.cover" placeholder="https://..." />
+          <el-form-item label="封面图">
+            <div class="cover-upload">
+              <el-image v-if="form.cover" :src="form.cover" class="cover-preview" fit="cover" />
+              <div v-else class="cover-empty">暂无封面</div>
+              <el-upload
+                :show-file-list="false"
+                :http-request="handleCoverUpload"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+              >
+                <el-button :loading="coverUploading" :icon="Upload">上传封面</el-button>
+              </el-upload>
+              <el-input v-model="form.cover" placeholder="上传后自动回填，也可手动填写图片 URL" />
+            </div>
           </el-form-item>
 
           <el-form-item label="合集">
@@ -93,11 +114,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules, type UploadRequestOptions } from 'element-plus'
+import { Upload, VideoPlay } from '@element-plus/icons-vue'
 import { MdEditor } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import { getCollectionPage, type Collection } from '@/api/collection'
 import { getTagPage, type Tag } from '@/api/tag'
+import { uploadImage, uploadVideo } from '@/api/file'
 import {
   getArticleDetail,
   saveArticle,
@@ -110,6 +133,8 @@ const router = useRouter()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 const saving = ref(false)
+const coverUploading = ref(false)
+const videoUploading = ref(false)
 const tags = ref<Tag[]>([])
 const collections = ref<Collection[]>([])
 const articleId = computed(() => route.query.id ? Number(route.query.id) : null)
@@ -209,6 +234,34 @@ async function submit(status: number) {
   }
 }
 
+async function handleCoverUpload(options: UploadRequestOptions) {
+  coverUploading.value = true
+  try {
+    const res = await uploadImage(options.file, 'article')
+    form.cover = res.data.url
+    ElMessage.success('封面上传成功')
+  } finally {
+    coverUploading.value = false
+  }
+}
+
+async function handleMarkdownImageUpload(files: File[], callback: (urls: string[]) => void) {
+  const results = await Promise.all(files.map((file) => uploadImage(file, 'article')))
+  callback(results.map((item) => item.data.url))
+  ElMessage.success('图片上传成功')
+}
+
+async function handleVideoUpload(options: UploadRequestOptions) {
+  videoUploading.value = true
+  try {
+    const res = await uploadVideo(options.file, 'article')
+    form.contentMd += `\n\n<video src="${res.data.url}" controls style="max-width: 100%; border-radius: 8px;"></video>\n`
+    ElMessage.success('视频上传成功')
+  } finally {
+    videoUploading.value = false
+  }
+}
+
 function goBack() {
   router.push('/content/article')
 }
@@ -236,7 +289,29 @@ onMounted(async () => {
   backdrop-filter: blur(18px);
 }
 .markdown-editor { height: 520px; }
+.editor-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  width: 100%;
+}
 .switch-list { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.cover-upload { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.cover-preview,
+.cover-empty {
+  width: 100%;
+  height: 132px;
+  border-radius: 8px;
+  border: 1px solid rgba(232, 237, 246, .88);
+}
+.cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--main-bg);
+  color: var(--text-muted);
+  font-size: 13px;
+}
 
 @media (max-width: 960px) {
   .page-header { align-items: flex-start; flex-direction: column; }

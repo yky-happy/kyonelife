@@ -58,6 +58,9 @@ const menus = [
       { path: '/system/menu', title: '菜单管理', icon: 'Menu' },
       { path: '/system/user', title: '用户管理', icon: 'User' },
       { path: '/system/config', title: '网站配置', icon: 'Setting' },
+      { path: '/system/operation-log', title: '操作日志', icon: 'Tickets' },
+      { path: '/system/runtime-log', title: '运行日志', icon: 'Monitor' },
+      { path: '/system/analytics', title: '数据看板', icon: 'DataAnalysis' },
     ],
   },
 ]

@@ -52,6 +52,7 @@ const titleMap: Record<string, { group: string; title: string }> = {
   '/system/menu':         { group: '系统管理', title: '菜单管理' },
   '/system/user':         { group: '系统管理', title: '用户管理' },
   '/system/config':       { group: '系统管理', title: '网站配置' },
+  '/system/operation-log': { group: '系统管理', title: '操作日志' },
 }
 
 const currentGroup = computed(() => titleMap[route.path]?.group ?? '博客管理')

@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { getCollectionList } from '../../api/collection'
 import type { CollectionItem } from '../../api/types'
+import { trackEvent } from '../../utils/tracker'
 
 const collections = ref<CollectionItem[]>([])
 const loading = ref(false)
@@ -40,6 +41,7 @@ onMounted(loadCollections)
         :key="item.id"
         :to="`/collection/${item.id}`"
         class="collection-card"
+        @click="trackEvent('collection_click', { collectionId: item.id, pageUrl: `/collection/${item.id}` })"
       >
         <div v-if="item.cover" class="collection-cover" :style="{ backgroundImage: `url(${item.cover})` }"></div>
         <strong>{{ item.name }}</strong>
