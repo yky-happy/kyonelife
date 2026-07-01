@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yky.blog.admin.vo.AnalyticsTrendVO;
 import com.yky.blog.admin.vo.HotArticleVO;
 import com.yky.blog.common.entity.EventLog;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -13,6 +14,24 @@ import java.util.List;
 
 @Mapper
 public interface EventLogMapper extends BaseMapper<EventLog> {
+
+    /**
+     * 批量插入埋点明细（单条多值 INSERT），由事件流消费者攒批调用，降低写放大。
+     */
+    @Insert("""
+            <script>
+            INSERT INTO event_log
+              (event_type, visitor_id, article_id, tag_id, collection_id, keyword,
+               page_url, referrer, ip, ip_location, user_agent, device, browser, os, duration, create_time)
+            VALUES
+            <foreach collection='list' item='e' separator=','>
+              (#{e.eventType}, #{e.visitorId}, #{e.articleId}, #{e.tagId}, #{e.collectionId}, #{e.keyword},
+               #{e.pageUrl}, #{e.referrer}, #{e.ip}, #{e.ipLocation}, #{e.userAgent}, #{e.device}, #{e.browser}, #{e.os},
+               #{e.duration}, #{e.createTime})
+            </foreach>
+            </script>
+            """)
+    int insertBatch(@Param("list") List<EventLog> list);
 
     @Select("""
             SELECT COUNT(*)

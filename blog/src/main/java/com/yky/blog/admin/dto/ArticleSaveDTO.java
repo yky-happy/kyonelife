@@ -65,4 +65,10 @@ public class ArticleSaveDTO {
     @Schema(description = "转载原文链接")
     @Size(max = 500, message = "转载原文链接最多500个字符")
     private String originalUrl;
+
+    @Schema(description = "文章图集（多图 URL，按顺序）")
+    private List<String> images;
+
+    @Schema(description = "定时发布时间；未来时间则先存草稿到点自动发布，空/过去则按 status 立即生效")
+    private java.time.LocalDateTime publishTime;
 }

@@ -1,0 +1,197 @@
+<!-- @dsCard group="Pages" -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>方向④ 杂志门户 · 布局优先(配色/字体可调)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+  /* 标题字体借用参考站「仓耳渔阳体」，加载失败则回退衬线（字体可换） */
+  @font-face{ font-family:"CangEr"; src:url("http://static.dasenbuling.cn/smart-blog/fonts/CangErYuYangTiW03.ttf") format("truetype"); font-display:swap; }
+  @font-face{ font-family:"Puhui"; src:url("http://static.dasenbuling.cn/smart-blog/fonts/alibaba_puhui_regular.ttf") format("truetype"); font-display:swap; }
+  :root{
+    /* —— 绿色花园色系（可一键替换）—— */
+    --ink:#1d2a1c; --soft:#46523f; --muted:#869180; --faint:#aab4a2;
+    --bg:#f4faf0; --card:#ffffff; --line:#e3ecdb;
+    --accent:#4e9d5b; --accent-deep:#3c7a48; --accent-soft:#e9f5e7;
+    --display:"CangEr","Noto Serif SC",Georgia,serif;
+    --sans:"Puhui","Inter","Noto Sans SC",system-ui,sans-serif;
+    --r:18px; --r-lg:24px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--soft);line-height:1.62;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(circle at 88% -4%,rgba(78,157,91,.10),transparent 36%),linear-gradient(180deg,#f7fcf3,var(--bg));min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  ::selection{background:var(--accent);color:#fff}
+  .wrap{width:min(1200px,calc(100% - 48px));margin:0 auto}
+  .display{font-family:var(--display)}
+
+  /* ===== 顶栏 ===== */
+  .head{position:sticky;top:14px;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:12px 20px;margin-top:14px;border:1px solid rgba(255,255,255,.7);border-radius:16px;
+    background:rgba(255,255,255,.72);backdrop-filter:blur(18px);box-shadow:0 12px 34px rgba(40,60,35,.07)}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .m{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--accent),#7cc98a);display:grid;place-items:center;color:#fff;font-weight:800;font-family:var(--display);font-size:20px}
+  .brand b{font-family:var(--display);font-size:19px;color:var(--ink);letter-spacing:.5px;font-weight:700}
+  .nav{display:flex;gap:28px;align-items:center}
+  .nav a{font-size:14.5px;color:var(--soft);position:relative}
+  .nav a.on,.nav a:hover{color:var(--accent-deep)}
+  .nav a.on::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:2px;background:var(--accent);border-radius:2px}
+  .search{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);cursor:pointer}
+
+  /* ===== 精选展示：大图 + 并列两小卡 ===== */
+  .hero{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;margin:26px 0 14px}
+  .feat-big{position:relative;border-radius:var(--r-lg);overflow:hidden;min-height:380px;display:flex;align-items:flex-end;
+    background:linear-gradient(140deg,#3a6b46,#7fae5f);box-shadow:0 30px 64px rgba(40,70,35,.2);cursor:pointer}
+  .feat-big::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(15,30,15,.72))}
+  .feat-big .c{position:relative;z-index:2;padding:34px 36px;color:#fff}
+  .kx{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:2px;text-transform:uppercase;
+    background:rgba(255,255,255,.18);backdrop-filter:blur(6px);padding:6px 13px;border-radius:999px}
+  .feat-big h2{font-family:var(--display);font-size:34px;line-height:1.25;margin:16px 0 12px;font-weight:700;letter-spacing:.5px}
+  .feat-big p{font-size:14.5px;color:rgba(255,255,255,.82);max-width:42ch}
+  .feat-big .mt{margin-top:18px;font-size:13px;color:rgba(255,255,255,.72);display:flex;gap:14px}
+
+  .feat-col{display:grid;grid-template-rows:1fr 1fr;gap:18px}
+  .feat-sm{position:relative;border-radius:var(--r-lg);overflow:hidden;padding:24px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff;cursor:pointer;min-height:181px}
+  .feat-sm::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(15,30,15,.7))}
+  .feat-sm.a{background:linear-gradient(140deg,#5a8f6a,#9cc47a)}
+  .feat-sm.b{background:linear-gradient(140deg,#4a7d8f,#7cb0a0)}
+  .feat-sm .c{position:relative;z-index:2}
+  .feat-sm span{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.85}
+  .feat-sm h3{font-family:var(--display);font-size:18px;line-height:1.4;margin-top:8px;font-weight:700}
+
+  /* ===== 正文：文章流 + 右侧粘性边栏 ===== */
+  .body-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:34px;margin-top:48px;align-items:start}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+  .sec-head h2{font-family:var(--display);font-size:24px;color:var(--ink);font-weight:700;letter-spacing:.5px}
+  .sec-head .more{font-size:14px;color:var(--accent-deep)}
+
+  /* 头条横卡 */
+  .lead{display:grid;grid-template-columns:230px 1fr;gap:22px;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:.28s;margin-bottom:24px}
+  .lead:hover{transform:translateY(-4px);box-shadow:0 26px 52px rgba(40,60,35,.12)}
+  .lead .cv{background:linear-gradient(135deg,#86c08f,#4e9d5b);min-height:190px}
+  .lead .c{padding:24px 26px 24px 4px;display:flex;flex-direction:column}
+  .lead .mt{display:flex;gap:13px;font-size:12.5px;color:var(--faint);margin-bottom:10px}
+  .lead h3{font-family:var(--display);font-size:23px;color:var(--ink);line-height:1.4;font-weight:700}
+  .lead p{font-size:14.5px;color:var(--muted);margin-top:10px;flex:1}
+
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:.28s;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-5px);box-shadow:0 24px 48px rgba(40,60,35,.12)}
+  .card .cv{height:140px;background:linear-gradient(135deg,#a9d2a0,#6fb079);position:relative}
+  .card:nth-child(2) .cv{background:linear-gradient(135deg,#9cc6c0,#5c97a0)}
+  .card:nth-child(3) .cv{background:linear-gradient(135deg,#c2cda0,#8aa45f)}
+  .pin{position:absolute;top:12px;left:12px;font-size:11px;background:#fff;color:var(--accent-deep);padding:4px 11px;border-radius:999px;font-weight:600}
+  .card .c{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+  .card .mt{display:flex;gap:12px;font-size:12px;color:var(--faint);margin-bottom:9px}
+  .card h3{font-family:var(--display);font-size:18px;color:var(--ink);line-height:1.45;font-weight:700}
+  .card p{font-size:13.5px;color:var(--muted);margin-top:8px;flex:1}
+  .tags{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .chip{font-size:11.5px;padding:3px 11px;border-radius:999px;background:var(--accent-soft);color:var(--accent-deep)}
+
+  .more-row{display:flex;justify-content:center;margin-top:34px}
+  .btn{padding:12px 30px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+  .btn:hover{border-color:var(--accent);color:var(--accent-deep)}
+
+  /* 右侧边栏 */
+  .side{position:sticky;top:90px;display:flex;flex-direction:column;gap:18px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px}
+  .panel .pt{font-family:var(--display);font-size:15px;color:var(--ink);font-weight:700;letter-spacing:.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .panel .pt::before{content:"";width:4px;height:15px;border-radius:2px;background:var(--accent)}
+  .about{text-align:center}
+  .about .ava{width:70px;height:70px;border-radius:20px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),#7cc98a);display:grid;place-items:center;color:#fff;font-family:var(--display);font-size:30px;font-weight:700}
+  .about h4{font-family:var(--display);font-size:18px;color:var(--ink);font-weight:700}
+  .about p{font-size:13px;color:var(--muted);margin-top:8px}
+  .about .social{display:flex;justify-content:center;gap:10px;margin-top:14px}
+  .about .social span{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);display:grid;place-items:center;color:var(--accent-deep);font-size:13px}
+  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center}
+  .stats .n{font-family:var(--display);font-size:22px;color:var(--ink);font-weight:700}
+  .stats .l{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .tagcloud{display:flex;flex-wrap:wrap;gap:9px}
+  .tagcloud a{font-size:13px;padding:6px 13px;border-radius:999px;background:var(--accent-soft);color:var(--accent-deep);transition:.2s}
+  .tagcloud a:hover{background:var(--accent);color:#fff}
+
+  .site-footer{margin-top:54px;padding:40px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:14px}
+  .site-footer b{font-family:var(--display);color:var(--ink);letter-spacing:.5px}
+
+  @media(max-width:960px){
+    .hero{grid-template-columns:1fr}.feat-col{grid-template-rows:none;grid-template-columns:1fr 1fr}
+    .body-grid{grid-template-columns:1fr}.side{position:static;flex-direction:row;flex-wrap:wrap}.panel{flex:1;min-width:240px}
+  }
+  @media(max-width:680px){.nav{display:none}.cards{grid-template-columns:1fr}.lead{grid-template-columns:1fr}.feat-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <a class="brand" href="#"><span class="m">K</span><b>Kyonelife</b></a>
+      <nav class="nav"><a class="on">首页</a><a>标签</a><a>合集</a><a>归档</a><a>关于</a></nav>
+      <div class="search">⌕</div>
+    </header>
+
+    <!-- 精选展示 -->
+    <section class="hero">
+      <a class="feat-big">
+        <div class="c">
+          <span class="kx">★ 编辑精选</span>
+          <h2>用 Redis 给博客做<br>数据聚合缓存</h2>
+          <p>把热点数据从数据库前移到缓存层,聊聊聚合、过期与一致性之间的取舍与权衡。</p>
+          <div class="mt"><span>后端 · 性能</span><span>2026.06.23</span><span>1.2k 阅读</span></div>
+        </div>
+      </a>
+      <div class="feat-col">
+        <a class="feat-sm a"><div class="c"><span>全栈手记</span><h3>从零搭建埋点系统的踩坑记录</h3></div></a>
+        <a class="feat-sm b"><div class="c"><span>运维日常</span><h3>MinIO 操作日志与运行日志分析</h3></div></a>
+      </div>
+    </section>
+
+    <!-- 正文双栏 -->
+    <div class="body-grid">
+      <div class="main-col">
+        <div class="sec-head"><h2>最新文章</h2><a class="more" href="#">查看全部 →</a></div>
+
+        <a class="lead">
+          <div class="cv"></div>
+          <div class="c">
+            <div class="mt"><span>产品 · 设计</span><span>2026.06.02</span><span>560 阅读</span></div>
+            <h3>博客去同质化的最终改进方向</h3>
+            <p>当所有模板都长一个样,如何让自己的博客重新拥有"人味"与记忆点——从字体、配色到内容编排的一次完整复盘。</p>
+          </div>
+        </a>
+
+        <div class="cards">
+          <article class="card"><div class="cv"><span class="pin">置顶</span></div><div class="c"><div class="mt"><span>2026.06.24</span><span>980 阅读</span></div><h3>从零搭建埋点系统</h3><p>采集、上报、清洗,以及那些半夜的 bug。</p><div class="tags"><span class="chip">全栈</span><span class="chip">埋点</span></div></div></article>
+          <article class="card"><div class="cv"></div><div class="c"><div class="mt"><span>2026.06.09</span><span>710 阅读</span></div><h3>MinIO 日志分析</h3><p>把"发生了什么"变成可检索的结构化日志。</p><div class="tags"><span class="chip">运维</span><span class="chip">MinIO</span></div></div></article>
+          <article class="card"><div class="cv"></div><div class="c"><div class="mt"><span>2026.05.29</span><span>430 阅读</span></div><h3>前台展示 MVP 规划</h3><p>先跑通最小闭环,再谈花活与打磨。</p><div class="tags"><span class="chip">规划</span></div></div></article>
+        </div>
+
+        <div class="more-row"><a class="btn">继续探索</a></div>
+      </div>
+
+      <!-- 右侧粘性边栏 -->
+      <aside class="side">
+        <div class="panel about">
+          <div class="ava">K</div>
+          <h4>Kyonelife</h4>
+          <p>守护一朵玫瑰,也记录每一次远行。技术、生活与思考。</p>
+          <div class="social"><span>GH</span><span>✉</span><span>♫</span></div>
+        </div>
+        <div class="panel">
+          <div class="pt">小站数据</div>
+          <div class="stats"><div><div class="n">24</div><div class="l">文章</div></div><div><div class="n">8</div><div class="l">标签</div></div><div><div class="n">3.6k</div><div class="l">阅读</div></div></div>
+        </div>
+        <div class="panel">
+          <div class="pt">热门标签</div>
+          <div class="tagcloud"><a>后端</a><a>Redis</a><a>全栈</a><a>埋点</a><a>运维</a><a>设计</a><a>Vue</a><a>性能</a></div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="site-footer"><span>守护一朵玫瑰,也记录每一次远行。</span><b>Kyonelife Blog</b></footer>
+  </div>
+</body>
+</html>

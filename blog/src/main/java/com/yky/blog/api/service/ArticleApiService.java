@@ -14,4 +14,10 @@ public interface ArticleApiService {
     ArticleWebDetailVO getArticleDetail(Long id);
 
     List<ArchiveMonthVO> listArchive();
+
+    /** 热门文章（按阅读量倒序）。 */
+    List<ArticleCardVO> listHot(int limit);
+
+    /** 相关文章推荐（按共同标签）。 */
+    List<ArticleCardVO> listRelated(Long id, int limit);
 }

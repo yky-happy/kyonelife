@@ -1,5 +1,6 @@
 package com.yky.blog.admin.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yky.blog.admin.service.OperationLogService;
 import com.yky.blog.common.entity.OperationLog;
@@ -24,6 +25,7 @@ public class OperationLogController {
     private final OperationLogService operationLogService;
 
     @Operation(summary = "分页查询操作日志")
+    @SaCheckPermission("operation-log:list")
     @GetMapping("/page")
     public Result<IPage<OperationLog>> page(@RequestParam(defaultValue = "1") int page,
                                             @RequestParam(defaultValue = "10") int size,

@@ -6,6 +6,15 @@ export interface PageResult<T> {
   pages: number
 }
 
+export interface BannerItem {
+  id: number
+  imageUrl: string
+  linkUrl: string
+  title: string
+  sort: number
+  status: number
+}
+
 export interface TagItem {
   id: number
   name: string
@@ -36,12 +45,19 @@ export interface ArticleCard {
   createTime: string
 }
 
+export interface ArticleNav {
+  id: number
+  title: string
+}
+
 export interface ArticleDetail extends ArticleCard {
   content: string
   contentMd: string
   keywords: string
   isOriginal: number
   originalUrl: string
+  prevArticle: ArticleNav | null
+  nextArticle: ArticleNav | null
 }
 
 export interface ArchiveArticle {

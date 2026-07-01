@@ -1,6 +1,7 @@
 <template>
   <div class="page">
-    <div class="page-card">
+    <!-- 区域一：检索与操作 -->
+    <div class="page-card filter-card">
       <div class="toolbar">
         <div class="toolbar-left">
           <el-input v-model="keyword" placeholder="搜索文章标题" clearable style="width: 240px" :prefix-icon="Search" />
@@ -12,7 +13,14 @@
         </div>
         <el-button type="primary" :icon="Plus" @click="goWrite">写文章</el-button>
       </div>
+    </div>
 
+    <!-- 区域二：文章列表 -->
+    <div class="page-card list-card">
+      <div class="card-head">
+        <h3>文章列表</h3>
+        <span class="card-sub">共 {{ total }} 篇</span>
+      </div>
       <el-table :data="tableData" v-loading="loading" class="custom-table">
         <el-table-column label="封面" width="90">
           <template #default="{ row }">
@@ -128,12 +136,15 @@ async function handleDelete(row: Article) {
 </script>
 
 <style scoped>
-.page { height: 100%; }
-.page-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 24px; }
-.toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.page { display: flex; flex-direction: column; gap: 16px; min-height: 100%; }
+.filter-card .toolbar { margin-bottom: 0 !important; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; }
 .toolbar-left { display: flex; gap: 10px; }
-.custom-table { border-radius: 8px; overflow: hidden; }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+.card-head h3 { font-size: 16px; font-weight: 750; color: var(--ink-strong); }
+.card-sub { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.custom-table { border-radius: var(--radius); overflow: hidden; }
 .pagination { display: flex; justify-content: flex-end; margin-top: 18px; }
-.img-placeholder { width: 56px; height: 42px; border-radius: 6px; background: var(--main-bg); display: flex; align-items: center; justify-content: center; }
+.img-placeholder { width: 56px; height: 42px; border-radius: 8px; background: var(--main-bg); display: flex; align-items: center; justify-content: center; }
 .text-muted { color: var(--text-muted); font-size: 12px; }
 </style>

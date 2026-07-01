@@ -1,17 +1,29 @@
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { setPageHeader } from '../../composables/pageHeader'
+import { setMeta } from '../../utils/seo'
+import { ensureSiteConfig, author, authorAvatar, aboutMe, github, email } from '../../composables/siteConfig'
+
+onMounted(() => {
+  setPageHeader({ type: 'page', title: '关于', subtitle: '关于这个博客，以及写它的人' })
+  setMeta({ title: '关于' })
+  ensureSiteConfig()
+})
+</script>
+
 <template>
-  <section class="about-page">
-    <div class="about-card">
-      <p class="eyebrow">about</p>
-      <h1>Kyonelife</h1>
-      <p>
-        这里是一个关于技术、生活和长期思考的个人空间。页面采用原创的星球、玫瑰、狐狸意象，
-        让阅读更像一次轻盈的旅行。
-      </p>
-      <div class="about-visual" aria-hidden="true">
-        <span class="rose-dot"></span>
-        <span class="fox-tail"></span>
-        <span class="small-star"></span>
+  <div class="ky-layout">
+    <main class="ky-main">
+      <div class="ky-card about-card">
+        <img v-if="authorAvatar" class="about-avatar-img" :src="authorAvatar" :alt="author" />
+        <div v-else class="about-avatar">{{ author.slice(0, 1).toUpperCase() }}</div>
+        <h1>{{ author }}</h1>
+        <p class="about-text">{{ aboutMe }}</p>
+        <div class="about-social">
+          <a v-if="github" :href="github" target="_blank" rel="noopener" title="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a v-if="email" :href="`mailto:${email}`" title="邮箱"><i class="fa-solid fa-envelope"></i></a>
+        </div>
       </div>
-    </div>
-  </section>
+    </main>
+  </div>
 </template>

@@ -1,5 +1,6 @@
 package com.yky.blog.admin.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yky.blog.admin.dto.CollectionSaveDTO;
 import com.yky.blog.admin.service.CollectionService;
@@ -21,6 +22,7 @@ public class CollectionController {
     private final CollectionService collectionService;
 
     @Operation(summary = "分页查询合集")
+    @SaCheckPermission("collection:list")
     @GetMapping("/page")
     public Result<IPage<CollectionVO>> page(@RequestParam(defaultValue = "1") int page,
                                             @RequestParam(defaultValue = "10") int size,
@@ -29,6 +31,7 @@ public class CollectionController {
     }
 
     @Operation(summary = "新增合集")
+    @SaCheckPermission("collection:add")
     @OperationLogRecord(module = "合集管理", operation = "新增合集")
     @PostMapping
     public Result<Long> save(@Valid @RequestBody CollectionSaveDTO dto) {
@@ -36,6 +39,7 @@ public class CollectionController {
     }
 
     @Operation(summary = "编辑合集")
+    @SaCheckPermission("collection:edit")
     @OperationLogRecord(module = "合集管理", operation = "编辑合集")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody CollectionSaveDTO dto) {
@@ -44,6 +48,7 @@ public class CollectionController {
     }
 
     @Operation(summary = "删除合集")
+    @SaCheckPermission("collection:delete")
     @OperationLogRecord(module = "合集管理", operation = "删除合集")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {

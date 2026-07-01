@@ -13,4 +13,13 @@ public class ArticleWebDetailVO extends ArticleCardVO {
     private String keywords;
     private Integer isOriginal;
     private String originalUrl;
+
+    @Schema(description = "同合集上一篇（更早），无则为 null")
+    private ArticleNavVO prevArticle;
+
+    @Schema(description = "同合集下一篇（更晚），无则为 null")
+    private ArticleNavVO nextArticle;
+
+    @Schema(description = "文章图集（多图 URL）")
+    private java.util.List<String> images;
 }

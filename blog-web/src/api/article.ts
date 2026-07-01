@@ -17,3 +17,20 @@ export const getArticleDetail = (id: number) =>
 
 export const getArticleArchive = () =>
   request.get<unknown, ArchiveMonth[]>('/api/article/archive')
+
+export const getHotArticles = (limit = 5) =>
+  request.get<unknown, ArticleCard[]>('/api/article/hot', { params: { limit } })
+
+export const getRelatedArticles = (id: number, limit = 6) =>
+  request.get<unknown, ArticleCard[]>(`/api/article/${id}/related`, { params: { limit } })
+
+export interface LikeStatus {
+  liked: boolean
+  likeCount: number
+}
+
+export const getLikeStatus = (id: number, visitorId: string) =>
+  request.get<unknown, LikeStatus>(`/api/article/${id}/like-status`, { params: { visitorId } })
+
+export const toggleLike = (id: number, visitorId: string) =>
+  request.post<unknown, LikeStatus>(`/api/article/${id}/like`, { visitorId })

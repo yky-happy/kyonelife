@@ -4,6 +4,11 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### 本地密钥配置（不进版本库）###
+src/main/resources/application-dev.yml
+.env
+logs/
+
 ### STS ###
 .apt_generated
 .classpath

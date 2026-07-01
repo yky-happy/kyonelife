@@ -15,6 +15,7 @@ const router = createRouter({
         { path: 'collection/:id', name: 'collection-detail', component: () => import('../views/collection/detail.vue') },
         { path: 'archives', name: 'archives', component: () => import('../views/archive/index.vue') },
         { path: 'about', name: 'about', component: () => import('../views/about/index.vue') },
+        { path: ':pathMatch(.*)*', name: 'not-found', component: () => import('../views/error/404.vue') },
       ],
     },
   ],

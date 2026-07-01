@@ -1,5 +1,5 @@
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'is-open': mobileOpen }">
     <div class="sidebar-logo">
       <div class="logo-icon">
         <el-icon :size="22" color="#ffffff"><EditPen /></el-icon>
@@ -8,6 +8,9 @@
         <span class="logo-title">kyonelife</span>
         <span class="logo-sub">Content Studio</span>
       </div>
+      <button class="sidebar-close" type="button" aria-label="关闭菜单" @click="emit('close')">
+        <el-icon :size="18"><Close /></el-icon>
+      </button>
     </div>
 
     <nav class="sidebar-nav">
@@ -31,6 +34,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 
+defineProps<{ mobileOpen?: boolean }>()
+const emit = defineEmits<{ close: [] }>()
+
 const route = useRoute()
 
 const menus = [
@@ -44,9 +50,9 @@ const menus = [
     group: '内容管理',
     items: [
       { path: '/content/article', title: '文章管理', icon: 'Document' },
+      { path: '/content/agent', title: 'AI 创作助手', icon: 'MagicStick' },
       { path: '/content/collection', title: '合集管理', icon: 'Collection' },
       { path: '/content/tag', title: '标签管理', icon: 'PriceTag' },
-      { path: '/content/comment', title: '评论管理', icon: 'ChatDotRound' },
       { path: '/content/banner', title: '轮播管理', icon: 'Picture' },
     ],
   },
@@ -56,11 +62,13 @@ const menus = [
       { path: '/system/admin', title: '管理员', icon: 'UserFilled' },
       { path: '/system/role', title: '角色管理', icon: 'Avatar' },
       { path: '/system/menu', title: '菜单管理', icon: 'Menu' },
-      { path: '/system/user', title: '用户管理', icon: 'User' },
+      { path: '/system/user', title: '读者管理', icon: 'User' },
+      { path: '/system/comment', title: '评论管理', icon: 'ChatDotRound' },
       { path: '/system/config', title: '网站配置', icon: 'Setting' },
+      { path: '/system/file', title: '文件管理', icon: 'Files' },
+      { path: '/system/analytics', title: '数据看板', icon: 'DataAnalysis' },
       { path: '/system/operation-log', title: '操作日志', icon: 'Tickets' },
       { path: '/system/runtime-log', title: '运行日志', icon: 'Monitor' },
-      { path: '/system/analytics', title: '数据看板', icon: 'DataAnalysis' },
     ],
   },
 ]
@@ -74,33 +82,61 @@ function isActive(path: string) {
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background: var(--sidebar-bg);
-  border-right: 1px solid rgba(232, 237, 246, .82);
+  border-right: 1px solid var(--line-soft);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   overflow-y: auto;
-  box-shadow: 18px 0 50px rgba(20, 32, 51, .05);
-  backdrop-filter: blur(18px);
+  box-shadow: 18px 0 50px rgba(28, 37, 48, .04);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
 }
 
 .sidebar-logo {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 18px 14px 16px;
 }
 
+/* 抽屉关闭按钮：仅窄屏显示 */
+.sidebar-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-left: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .16s;
+}
+
+.sidebar-close:hover {
+  border-color: var(--accent);
+  color: var(--accent-deep);
+}
+
 .logo-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #2f6df6 0%, #15b8a6 100%);
-  border-radius: 12px;
+  background: var(--active-bg);
+  border-radius: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 14px 28px rgba(47, 109, 246, .22);
+  box-shadow: 0 12px 24px rgba(43, 50, 61, .18);
 }
 
 .logo-text {
@@ -144,9 +180,9 @@ function isActive(path: string) {
   align-items: center;
   gap: 10px;
   min-height: 38px;
-  padding: 9px 11px;
-  border-radius: 11px;
-  color: #64728a;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  color: #5c6675;
   text-decoration: none;
   font-size: 13px;
   font-weight: 650;
@@ -155,21 +191,43 @@ function isActive(path: string) {
 }
 
 .nav-item:hover {
-  background: rgba(47, 109, 246, .08);
-  color: var(--primary-hover);
+  background: rgba(43, 50, 61, .05);
+  color: var(--ink);
 }
 
 .nav-item:hover .el-icon {
-  color: var(--primary);
+  color: var(--ink);
 }
 
 .nav-item.active {
   background: var(--active-bg);
   color: var(--active-text);
-  box-shadow: 0 12px 26px rgba(47, 109, 246, .22);
+  box-shadow: 0 10px 22px rgba(43, 50, 61, .2);
 }
 
 .nav-item.active .el-icon {
   color: var(--active-text) !important;
+}
+
+/* ===== 窄屏：侧边栏变为可滑出的抽屉 ===== */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    transform: translateX(-100%);
+    transition: transform .28s ease, box-shadow .28s ease;
+    box-shadow: none;
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 24px 0 60px rgba(28, 37, 48, .22);
+  }
+
+  .sidebar-close {
+    display: inline-flex;
+  }
 }
 </style>

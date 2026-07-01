@@ -63,20 +63,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { getBannerPage, saveBanner, updateBanner, deleteBanner, type Banner } from '@/api/banner'
 
 const loading = ref(false)
 const saving = ref(false)
 const dialogVisible = ref(false)
 const formRef = ref<FormInstance>()
-const tableData = ref<any[]>([])
+const tableData = ref<Banner[]>([])
 const form = reactive({ id: null as null | number, imageUrl: '', title: '', linkUrl: '', sort: 0, status: 1 })
 const rules: FormRules = { imageUrl: [{ required: true, message: '请填写图片地址', trigger: 'blur' }] }
 
+async function loadData() {
+  loading.value = true
+  try {
+    const res = await getBannerPage({ page: 1, size: 100 })
+    tableData.value = res.data.records
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadData)
+
 function openDialog(row?: any) {
-  row ? Object.assign(form, row) : Object.assign(form, { id: null, imageUrl: '', title: '', linkUrl: '', sort: 0, status: 1 })
+  row
+    ? Object.assign(form, { id: row.id, imageUrl: row.imageUrl, title: row.title, linkUrl: row.linkUrl, sort: row.sort, status: row.status })
+    : Object.assign(form, { id: null, imageUrl: '', title: '', linkUrl: '', sort: 0, status: 1 })
   formRef.value?.clearValidate()
   dialogVisible.value = true
 }
@@ -84,13 +99,27 @@ function openDialog(row?: any) {
 async function handleSave() {
   await formRef.value?.validate()
   saving.value = true
-  try { ElMessage.success(form.id ? '编辑成功' : '新增成功'); dialogVisible.value = false }
-  finally { saving.value = false }
+  try {
+    const dto = { imageUrl: form.imageUrl, title: form.title, linkUrl: form.linkUrl, sort: form.sort, status: form.status }
+    if (form.id) {
+      await updateBanner(form.id, dto)
+      ElMessage.success('编辑成功')
+    } else {
+      await saveBanner(dto)
+      ElMessage.success('新增成功')
+    }
+    dialogVisible.value = false
+    loadData()
+  } finally {
+    saving.value = false
+  }
 }
 
-async function handleDelete(_row: any) {
+async function handleDelete(row: any) {
   await ElMessageBox.confirm('确认删除该轮播图？', '提示', { type: 'warning' })
+  await deleteBanner(row.id)
   ElMessage.success('删除成功')
+  loadData()
 }
 </script>
 

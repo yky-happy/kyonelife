@@ -1,0 +1,92 @@
+# =========================================================
+# kyonelife 一键部署编排：MySQL + Redis + MinIO + 后端(blog)
+#
+#   1. cp .env.example .env   并按需改密钥
+#      （本地演示记得把 MINIO_PUBLIC_ENDPOINT 改成 http://localhost:9000）
+#   2. docker compose up -d --build
+#   3. 打开 http://localhost:8080/doc.html  查看 Knife4j 接口文档
+#
+# 后端跑 prod profile：连接信息默认指向下面的服务名 mysql/redis/minio
+# （见 application-prod.yml），compose 只需把 .env 里的密钥注入进来。
+# 变量命名与仓库既有的 .env.example 保持一致。
+# 前端 blog-admin / blog-web 默认在宿主机 npm 跑，见 README。
+# =========================================================
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: kyonelife-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB:-kyonelife}
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - ./docker-data/mysql:/var/lib/mysql
+      # 首次启动自动执行：建库 + 全部表 + 种子数据（含管理员 yky / admin123）
+      - ./blog/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: kyonelife-redis
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - ./docker-data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: kyonelife-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # 控制台
+    volumes:
+      - ./docker-data/minio:/data
+    restart: unless-stopped
+
+  blog:
+    build:
+      context: ./blog
+    image: kyonelife/blog:latest
+    container_name: kyonelife-blog
+    # 连接信息(MYSQL_HOST=mysql 等)与密钥统一从 .env 读取
+    env_file:
+      - .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        # 后端对 MinIO 不可用是容错的（仅告警不阻塞启动），故不等 healthy
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # 显式钉死容器内网地址，避免 .env 里被改成宿主机地址后连不上
+      MYSQL_HOST: mysql
+      REDIS_HOST: redis
+      MINIO_ENDPOINT: http://minio:9000
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    volumes:
+      - ./docker-data/blog-logs:/app/logs
+    restart: unless-stopped

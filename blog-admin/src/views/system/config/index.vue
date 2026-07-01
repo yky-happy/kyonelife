@@ -79,18 +79,6 @@
         </div>
 
         <div class="section">
-          <p class="section-title">功能开关</p>
-          <el-row :gutter="24">
-            <el-col :span="12">
-              <el-form-item label="开启评论">
-                <el-switch v-model="form.openComment" :active-value="1" :inactive-value="0"
-                  active-text="开启" inactive-text="关闭" />
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </div>
-
-        <div class="section">
           <p class="section-title">公告内容</p>
           <el-form-item label="">
             <el-input v-model="form.bulletin" type="textarea" :rows="3"
@@ -111,10 +99,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { ElMessage, type UploadRequestOptions } from 'element-plus'
 import { Upload } from '@element-plus/icons-vue'
 import { uploadImage } from '@/api/file'
+import { getConfig, updateConfig } from '@/api/config'
 
 const saving = ref(false)
 const avatarUploading = ref(false)
@@ -122,13 +111,25 @@ const avatarUploading = ref(false)
 const form = reactive({
   siteName: '', logo: '', summary: '', author: '', authorAvatar: '',
   signature: '', github: '', email: '', aboutMe: '', icpNumber: '',
-  bulletin: '', openComment: 1,
+  bulletin: '',
+})
+
+onMounted(async () => {
+  const res = await getConfig()
+  if (res.data) {
+    Object.keys(form).forEach((k) => {
+      const v = (res.data as Record<string, unknown>)[k]
+      if (v !== null && v !== undefined) {
+        (form as Record<string, unknown>)[k] = v
+      }
+    })
+  }
 })
 
 async function handleSave() {
   saving.value = true
   try {
-    await new Promise(r => setTimeout(r, 500))
+    await updateConfig({ ...form })
     ElMessage.success('配置已保存')
   } finally {
     saving.value = false

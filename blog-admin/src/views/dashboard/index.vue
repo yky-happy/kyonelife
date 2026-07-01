@@ -69,12 +69,24 @@
 </template>
 
 <script setup lang="ts">
-const stats = [
-  { label: '文章总数',  value: '--', icon: 'Document',     color: '#2f6df6', bg: '#eef5ff', trend: 0 },
-  { label: '标签数量',  value: '--', icon: 'PriceTag',     color: '#15b8a6', bg: '#ecfdf8', trend: 0 },
-  { label: '评论总数',  value: '--', icon: 'ChatDotRound', color: '#ff8a5b', bg: '#fff3ec', trend: 0 },
-  { label: '注册用户',  value: '--', icon: 'User',         color: '#7c6df2', bg: '#f3f1ff', trend: 0 },
-]
+import { ref, onMounted } from 'vue'
+import { getDashboardStats } from '@/api/dashboard'
+
+const stats = ref([
+  { label: '文章总数',  value: '--' as string | number, icon: 'Document',      color: '#2f6df6', bg: '#eef5ff', trend: 0 },
+  { label: '标签数量',  value: '--' as string | number, icon: 'PriceTag',      color: '#15b8a6', bg: '#ecfdf8', trend: 0 },
+  { label: '总浏览量',  value: '--' as string | number, icon: 'View',          color: '#ff8a5b', bg: '#fff3ec', trend: 0 },
+  { label: '注册用户',  value: '--' as string | number, icon: 'User',          color: '#7c6df2', bg: '#f3f1ff', trend: 0 },
+])
+
+onMounted(async () => {
+  const res = await getDashboardStats()
+  const d = res.data
+  stats.value[0].value = d.articleCount
+  stats.value[1].value = d.tagCount
+  stats.value[2].value = d.totalViews
+  stats.value[3].value = d.userCount
+})
 </script>
 
 <style scoped>

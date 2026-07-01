@@ -24,5 +24,4 @@ public class WebConfig extends BaseEntity {
     private String aboutMe;
     private String icpNumber;
     private String bulletin;
-    private Integer openComment;
 }

@@ -1,0 +1,88 @@
+<!-- @dsCard group="Pages" -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>方向① 极简黑白 · 瑞士网格</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0a0a0a; --soft:#3a3a3a; --muted:#8c8c8c; --line:#e6e6e6; --bg:#ffffff;
+    --sans:"Inter","Noto Sans SC",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--soft);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--ink);color:#fff}
+  .wrap{width:min(1200px,calc(100% - 56px));margin:0 auto}
+  a{color:inherit;text-decoration:none}
+
+  .head{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid var(--ink)}
+  .brand{font-weight:900;font-size:20px;letter-spacing:-.5px;color:var(--ink)}
+  .nav{display:flex;gap:32px}
+  .nav a{font-size:13px;font-weight:500;color:var(--soft);text-transform:uppercase;letter-spacing:1px}
+  .nav a:hover{color:var(--ink)}
+
+  .hero{padding:80px 0 60px;border-bottom:1px solid var(--ink)}
+  .hero .kx{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:26px}
+  .hero h1{font-size:clamp(44px,8vw,104px);line-height:.98;font-weight:900;color:var(--ink);letter-spacing:-3px}
+  .hero .sub{display:flex;justify-content:space-between;align-items:flex-end;margin-top:34px;gap:40px;flex-wrap:wrap}
+  .hero p{font-size:17px;color:var(--muted);max-width:52ch}
+  .arrow{font-size:14px;font-weight:600;color:var(--ink);text-transform:uppercase;letter-spacing:1px;white-space:nowrap;border-bottom:2px solid var(--ink);padding-bottom:3px}
+
+  .sec-label{display:flex;justify-content:space-between;align-items:baseline;padding:48px 0 8px}
+  .sec-label h2{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--ink)}
+  .sec-label span{font-size:13px;color:var(--muted)}
+
+  /* 文章=编号列表，瑞士风 */
+  .list{border-top:1px solid var(--ink)}
+  .row{display:grid;grid-template-columns:64px 1fr auto;gap:28px;align-items:center;padding:28px 0;border-bottom:1px solid var(--line);transition:padding .25s ease,background .25s}
+  .row:hover{padding-left:14px;padding-right:14px;background:#fafafa}
+  .row .no{font-size:15px;font-weight:700;color:var(--muted)}
+  .row .ti{}
+  .row .ti h3{font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.6px;line-height:1.15}
+  .row .ti .mt{display:flex;gap:14px;margin-top:9px;font-size:13px;color:var(--muted)}
+  .row .ti .mt b{color:var(--ink);font-weight:600}
+  .row .go{font-size:30px;color:var(--line);transition:color .2s,transform .2s}
+  .row:hover .go{color:var(--ink);transform:translateX(6px)}
+
+  .more{display:flex;justify-content:center;padding:54px 0}
+  .more a{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--ink);border:1px solid var(--ink);padding:15px 40px;border-radius:0;transition:.2s}
+  .more a:hover{background:var(--ink);color:#fff}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;padding:40px 0;border-top:1px solid var(--ink);font-size:13px;color:var(--muted)}
+  .foot b{color:var(--ink);font-weight:700}
+  @media(max-width:720px){.nav{display:none}.row{grid-template-columns:36px 1fr;gap:16px}.row .go{display:none}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="brand">KYONELIFE</div>
+      <nav class="nav"><a>首页</a><a>标签</a><a>合集</a><a>归档</a><a>关于</a></nav>
+    </header>
+
+    <section class="hero">
+      <div class="kx">planet journal · since 2026</div>
+      <h1>记录技术、<br>生活与思考。</h1>
+      <div class="sub">
+        <p>把日常里的微光,整理成可以再次出发的文章。每篇都像一次星际停靠——带着好奇,也带着一点柔软。</p>
+        <a class="arrow">阅读文章 →</a>
+      </div>
+    </section>
+
+    <div class="sec-label"><h2>Latest Notes</h2><span>共 24 篇</span></div>
+    <div class="list">
+      <a class="row"><div class="no">01</div><div class="ti"><h3>用 Redis 给博客做数据聚合缓存</h3><div class="mt"><b>后端</b><span>2026.06.23</span><span>1.2k 阅读</span></div></div><div class="go">→</div></a>
+      <a class="row"><div class="no">02</div><div class="ti"><h3>从零搭建埋点系统的踩坑记录</h3><div class="mt"><b>全栈</b><span>2026.06.24</span><span>980 阅读</span></div></div><div class="go">→</div></a>
+      <a class="row"><div class="no">03</div><div class="ti"><h3>MinIO 操作日志与运行日志分析</h3><div class="mt"><b>运维</b><span>2026.06.09</span><span>710 阅读</span></div></div><div class="go">→</div></a>
+      <a class="row"><div class="no">04</div><div class="ti"><h3>博客去同质化的最终改进方向</h3><div class="mt"><b>产品</b><span>2026.06.02</span><span>560 阅读</span></div></div><div class="go">→</div></a>
+    </div>
+    <div class="more"><a>继续探索</a></div>
+
+    <footer class="foot"><span>守护一朵玫瑰,也记录每一次远行。</span><b>KYONELIFE BLOG</b></footer>
+  </div>
+</body>
+</html>

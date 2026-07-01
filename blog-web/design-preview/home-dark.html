@@ -1,0 +1,102 @@
+<!-- @dsCard group="Pages" -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>方向② 暗色高级 · 深色质感</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0b0c10; --panel:#15171e; --card:#14161d; --line:rgba(255,255,255,.08);
+    --text:#c8ccd6; --head:#f2f4f8; --muted:#7c8294;
+    --accent:#7c9cff; --accent-2:#5be5d0; --glow:rgba(124,156,255,.5);
+    --sans:"Inter","Noto Sans SC",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(circle at 12% 0%,rgba(124,156,255,.16),transparent 36%),
+      radial-gradient(circle at 90% 6%,rgba(91,229,208,.12),transparent 32%),
+      var(--bg);
+    min-height:100vh;}
+  ::selection{background:var(--accent);color:#0b0c10}
+  a{color:inherit;text-decoration:none}
+  .wrap{width:min(1160px,calc(100% - 48px));margin:0 auto}
+
+  .head{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;margin-top:16px;border:1px solid var(--line);border-radius:16px;
+    background:rgba(20,22,29,.55);backdrop-filter:blur(20px)}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;color:var(--head);font-size:18px}
+  .dot{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#0b0c10;font-weight:800}
+  .nav{display:flex;gap:28px}
+  .nav a{font-size:14px;color:var(--muted)}.nav a:hover{color:var(--head)}
+
+  .hero{padding:84px 0 64px;text-align:center;position:relative}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--accent);
+    border:1px solid var(--line);border-radius:999px;padding:7px 16px;background:rgba(124,156,255,.07)}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent-2);box-shadow:0 0 10px var(--accent-2)}
+  .hero h1{font-size:clamp(40px,6.5vw,76px);line-height:1.05;font-weight:800;color:var(--head);letter-spacing:-1.5px;margin:26px 0 22px}
+  .hero h1 .g{background:linear-gradient(120deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{font-size:17px;color:var(--muted);max-width:52ch;margin:0 auto}
+  .acts{display:flex;gap:14px;justify-content:center;margin-top:34px}
+  .btn{padding:13px 26px;border-radius:999px;font-size:14.5px;font-weight:600;transition:.22s;cursor:pointer;border:1px solid transparent}
+  .btn-p{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#0b0c10;box-shadow:0 14px 40px var(--glow)}
+  .btn-p:hover{transform:translateY(-2px)}
+  .btn-g{color:var(--head);border-color:var(--line)}.btn-g:hover{border-color:var(--accent)}
+
+  .sec-head{display:flex;justify-content:space-between;align-items:baseline;margin:46px 0 26px}
+  .sec-head h2{font-size:22px;font-weight:700;color:var(--head)}
+  .sec-head a{font-size:14px;color:var(--accent)}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;cursor:pointer;transition:.3s;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-5px);border-color:rgba(124,156,255,.4);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+  .cv{height:160px;background:linear-gradient(135deg,#2a3358,#3a5a6e);position:relative}
+  .card:nth-child(2) .cv{background:linear-gradient(135deg,#2c4a44,#3a6a5c)}
+  .card:nth-child(3) .cv{background:linear-gradient(135deg,#3a3358,#5a4a86)}
+  .card:nth-child(4) .cv{background:linear-gradient(135deg,#4a3350,#6e3a5a)}
+  .pin{position:absolute;top:13px;left:13px;font-size:11px;color:#0b0c10;background:var(--accent-2);padding:4px 11px;border-radius:999px;font-weight:600}
+  .cb{padding:22px 24px;display:flex;flex-direction:column;flex:1}
+  .mt{display:flex;gap:13px;font-size:12.5px;color:var(--muted);margin-bottom:11px}
+  .cb h3{font-size:20px;font-weight:700;color:var(--head);line-height:1.4}
+  .cb p{font-size:14.5px;color:var(--muted);margin-top:10px;flex:1}
+  .tags{display:flex;gap:8px;margin-top:16px}
+  .chip{font-size:12px;padding:4px 12px;border-radius:999px;border:1px solid var(--line);color:var(--text)}
+  .chip.c{background:rgba(124,156,255,.12);border-color:transparent;color:var(--accent)}
+
+  .more{display:flex;justify-content:center;margin-top:42px}
+  .foot{margin-top:46px;padding:40px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--muted);font-size:14px}
+  .foot b{color:var(--head)}
+  @media(max-width:820px){.nav{display:none}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="brand"><span class="dot">K</span> Kyonelife</div>
+      <nav class="nav"><a>首页</a><a>标签</a><a>合集</a><a>归档</a><a>关于</a></nav>
+    </header>
+
+    <section class="hero">
+      <span class="pill">planet journal · 服务在线</span>
+      <h1>把日常里的微光,<br>整理成<span class="g">再次出发</span>的文章。</h1>
+      <p>记录技术、生活与思考。愿每篇文章都像一次星际停靠——带着好奇,也带着一点柔软。</p>
+      <div class="acts"><a class="btn btn-p">阅读文章 →</a><a class="btn btn-g">查看归档</a></div>
+    </section>
+
+    <div class="sec-head"><h2>最新文章</h2><a>按标签浏览 →</a></div>
+    <div class="grid">
+      <article class="card"><div class="cv"><span class="pin">置顶</span></div><div class="cb"><div class="mt"><span>2026.06.23</span><span>1.2k 阅读</span></div><h3>用 Redis 给博客做数据聚合缓存</h3><p>把热点数据前移到缓存层,聊聊聚合、过期与一致性的取舍。</p><div class="tags"><span class="chip c">后端</span><span class="chip">Redis</span></div></div></article>
+      <article class="card"><div class="cv"></div><div class="cb"><div class="mt"><span>2026.06.24</span><span>980 阅读</span></div><h3>从零搭建埋点系统的踩坑记录</h3><p>一套轻量埋点如何落地:采集、上报、清洗,以及那些半夜的 bug。</p><div class="tags"><span class="chip c">全栈</span><span class="chip">埋点</span></div></div></article>
+      <article class="card"><div class="cv"></div><div class="cb"><div class="mt"><span>2026.06.09</span><span>710 阅读</span></div><h3>MinIO 操作日志与运行日志分析</h3><p>对象存储的可观测性实践,把"发生了什么"变成可检索的日志。</p><div class="tags"><span class="chip c">运维</span><span class="chip">MinIO</span></div></div></article>
+      <article class="card"><div class="cv"></div><div class="cb"><div class="mt"><span>2026.06.02</span><span>560 阅读</span></div><h3>博客去同质化的最终改进方向</h3><p>当所有模板都长一个样,如何让博客重新拥有记忆点。</p><div class="tags"><span class="chip c">产品</span><span class="chip">设计</span></div></div></article>
+    </div>
+    <div class="more"><a class="btn btn-g">继续探索</a></div>
+
+    <footer class="foot"><span>守护一朵玫瑰,也记录每一次远行。</span><b>Kyonelife Blog</b></footer>
+  </div>
+</body>
+</html>

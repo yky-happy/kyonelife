@@ -1,6 +1,9 @@
 <template>
   <header class="header">
     <div class="header-left">
+      <button class="hamburger" type="button" aria-label="展开菜单" @click="emit('toggleSidebar')">
+        <span></span><span></span><span></span>
+      </button>
       <nav class="breadcrumb">
         <span class="breadcrumb-root">{{ currentGroup }}</span>
         <el-icon :size="12" color="#d1d5db"><ArrowRight /></el-icon>
@@ -33,6 +36,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ElMessageBox } from 'element-plus'
 
+const emit = defineEmits<{ toggleSidebar: [] }>()
+
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
@@ -43,15 +48,16 @@ const titleMap: Record<string, { group: string; title: string }> = {
   '/dashboard':           { group: '概览',     title: '仪表盘' },
   '/content/article':     { group: '内容管理', title: '文章管理' },
   '/content/article/edit': { group: '内容管理', title: '写文章' },
+  '/content/agent':        { group: '内容管理', title: 'AI 创作助手' },
   '/content/collection':  { group: '内容管理', title: '合集管理' },
   '/content/tag':         { group: '内容管理', title: '标签管理' },
-  '/content/comment':     { group: '内容管理', title: '评论管理' },
   '/content/banner':      { group: '内容管理', title: '轮播管理' },
   '/system/admin':        { group: '系统管理', title: '管理员' },
   '/system/role':         { group: '系统管理', title: '角色管理' },
   '/system/menu':         { group: '系统管理', title: '菜单管理' },
   '/system/user':         { group: '系统管理', title: '用户管理' },
   '/system/config':       { group: '系统管理', title: '网站配置' },
+  '/system/file':         { group: '系统管理', title: '文件管理' },
   '/system/operation-log': { group: '系统管理', title: '操作日志' },
 }
 
@@ -70,20 +76,63 @@ async function handleCommand(cmd: string) {
 <style scoped>
 .header {
   height: var(--header-height);
-  background: rgba(255, 255, 255, .72);
-  border-bottom: 1px solid rgba(232, 237, 246, .8);
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--line-soft);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px 0 22px;
   flex-shrink: 0;
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ☰ 汉堡按钮：默认隐藏，窄屏显示 */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 38px;
+  height: 38px;
+  padding: 0 9px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg);
+  cursor: pointer;
+  transition: all .16s;
+}
+
+.hamburger span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: all .16s;
+}
+
+.hamburger:hover {
+  border-color: var(--accent);
+}
+
+.hamburger:hover span {
+  background: var(--accent-deep);
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+@media (max-width: 1024px) {
+  .hamburger { display: flex; }
 }
 
 .breadcrumb-root {
@@ -95,7 +144,7 @@ async function handleCommand(cmd: string) {
 .breadcrumb-current {
   font-size: 14px;
   font-weight: 800;
-  color: var(--text-main);
+  color: var(--ink-strong);
 }
 
 .user-info {
@@ -104,22 +153,24 @@ async function handleCommand(cmd: string) {
   gap: 8px;
   cursor: pointer;
   padding: 7px 10px 7px 7px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(20, 32, 51, .06);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-soft);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 6px 16px rgba(28, 37, 48, .05);
   transition: all 0.16s;
 }
 
 .user-info:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(20, 32, 51, .09);
+  box-shadow: 0 10px 22px rgba(28, 37, 48, .08);
 }
 
 .avatar {
   width: 30px;
   height: 30px;
-  background: linear-gradient(135deg, #2f6df6, #15b8a6);
+  background: var(--active-bg);
   border-radius: 50%;
   color: #fff;
   font-size: 13px;

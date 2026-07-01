@@ -18,4 +18,6 @@ public class ArticleDetailVO extends ArticleVO {
     private Integer carouselSort;
     private Integer isOriginal;
     private List<Long> tagIds;
+    private java.time.LocalDateTime publishTime;
+    private List<String> images;
 }

@@ -4,27 +4,36 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yky.blog.api.dto.ArchiveArticleVO;
 import com.yky.blog.api.dto.ArchiveMonthVO;
 import com.yky.blog.api.dto.ArticleCardVO;
+import com.yky.blog.api.dto.ArticleNavVO;
 import com.yky.blog.api.dto.ArticleWebDetailVO;
 import com.yky.blog.api.dto.TagApiVO;
 import com.yky.blog.api.service.ArticleApiService;
+import com.yky.blog.api.service.ArticleViewCountService;
 import com.yky.blog.common.entity.Article;
+import com.yky.blog.common.entity.ArticleImage;
 import com.yky.blog.common.entity.ArticleTag;
 import com.yky.blog.common.entity.Collection;
 import com.yky.blog.common.entity.Tag;
 import com.yky.blog.common.exception.BizException;
+import com.yky.blog.common.mapper.ArticleImageMapper;
 import com.yky.blog.common.mapper.ArticleMapper;
 import com.yky.blog.common.mapper.ArticleTagMapper;
 import com.yky.blog.common.mapper.CollectionMapper;
 import com.yky.blog.common.mapper.TagMapper;
+import com.yky.blog.common.redis.RedisCacheService;
+import com.yky.blog.common.redis.RedisKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,13 +51,31 @@ public class ArticleApiServiceImpl extends ServiceImpl<ArticleMapper, Article> i
 
     private static final int STATUS_PUBLISHED = 1;
     private static final DateTimeFormatter ARCHIVE_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
+    private static final Duration ARTICLE_PAGE_CACHE_TTL = Duration.ofSeconds(60);
+    private static final Duration ARCHIVE_CACHE_TTL = Duration.ofMinutes(3);
+    private static final Duration ARTICLE_DETAIL_CACHE_TTL = Duration.ofMinutes(5);
 
     private final ArticleTagMapper articleTagMapper;
+    private final ArticleImageMapper articleImageMapper;
     private final CollectionMapper collectionMapper;
     private final TagMapper tagMapper;
+    private final ArticleViewCountService articleViewCountService;
+    private final RedisCacheService redisCacheService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public IPage<ArticleCardVO> pageArticle(int page, int size, String keyword, Long tagId, Long collectionId) {
+        // 分页参数保护，避免 ?size=999999 压垮数据库
+        final int safePage = Math.max(page, 1);
+        final int safeSize = Math.min(Math.max(size, 1), 50);
+        String cacheKey = RedisKeys.cache("article:page:" + safePage + ":" + safeSize + ":"
+                + normalize(keyword) + ":" + normalize(tagId) + ":" + normalize(collectionId));
+        JavaType pageType = objectMapper.getTypeFactory().constructParametricType(Page.class, ArticleCardVO.class);
+        return redisCacheService.getOrLoad(cacheKey, pageType, ARTICLE_PAGE_CACHE_TTL,
+                () -> loadArticlePage(safePage, safeSize, keyword, tagId, collectionId));
+    }
+
+    private Page<ArticleCardVO> loadArticlePage(int page, int size, String keyword, Long tagId, Long collectionId) {
         List<Long> tagArticleIds = getPublishedArticleIdsByTag(tagId);
         if (tagId != null && tagArticleIds.isEmpty()) {
             return emptyPage(page, size);
@@ -56,7 +83,10 @@ public class ArticleApiServiceImpl extends ServiceImpl<ArticleMapper, Article> i
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<Article>()
                 .eq(Article::getStatus, STATUS_PUBLISHED)
-                .like(StringUtils.hasText(keyword), Article::getTitle, keyword)
+                .and(StringUtils.hasText(keyword), w -> w
+                        .like(Article::getTitle, keyword)
+                        .or().like(Article::getSummary, keyword)
+                        .or().like(Article::getContent, keyword))
                 .eq(collectionId != null, Article::getCollectionId, collectionId)
                 .in(tagId != null, Article::getId, tagArticleIds)
                 .orderByDesc(Article::getIsStick)
@@ -76,21 +106,82 @@ public class ArticleApiServiceImpl extends ServiceImpl<ArticleMapper, Article> i
 
     @Override
     public ArticleWebDetailVO getArticleDetail(Long id) {
-        Article article = getById(id);
-        if (article == null || !Objects.equals(article.getStatus(), STATUS_PUBLISHED)) {
+        // 详情是高频热点 key：经增强后的 getOrLoad 自带防穿透（空值缓存）、防击穿（互斥重建）、防雪崩（TTL 抖动）
+        JavaType detailType = objectMapper.getTypeFactory().constructType(ArticleWebDetailVO.class);
+        ArticleWebDetailVO vo = redisCacheService.getOrLoad(
+                RedisKeys.articleDetail(id), detailType, ARTICLE_DETAIL_CACHE_TTL,
+                () -> loadArticleDetail(id));
+        if (vo == null) {
+            // 命中空值缓存或数据库确实不存在，统一抛出，避免每次请求都打库
             throw new BizException("文章不存在");
         }
 
+        // 浏览量不进缓存基准之外：始终用 缓存内基础值 + Redis 实时增量，保证展示值实时
+        long base = vo.getViewCount() == null ? 0L : vo.getViewCount();
+        long delta = articleViewCountService.increaseAndGetDelta(id);
+        vo.setViewCount(base + delta);
+        return vo;
+    }
+
+    /**
+     * 回源加载文章详情；文章不存在或未发布时返回 null（交由上层缓存为空值哨兵防穿透）。
+     * 返回的 viewCount 为数据库基础值，实时增量在 {@link #getArticleDetail(Long)} 中叠加。
+     */
+    private ArticleWebDetailVO loadArticleDetail(Long id) {
+        Article article = getById(id);
+        if (article == null || !Objects.equals(article.getStatus(), STATUS_PUBLISHED)) {
+            return null;
+        }
         ArticleWebDetailVO vo = new ArticleWebDetailVO();
         BeanUtils.copyProperties(article, vo);
         fillCollectionAndTags(List.of(vo));
-        increaseViewCount(article);
-        vo.setViewCount(article.getViewCount() == null ? 1L : article.getViewCount() + 1);
+        vo.setViewCount(article.getViewCount() == null ? 0L : article.getViewCount());
+        vo.setImages(articleImageMapper.selectList(new LambdaQueryWrapper<ArticleImage>()
+                        .eq(ArticleImage::getArticleId, article.getId())
+                        .orderByAsc(ArticleImage::getSort))
+                .stream().map(ArticleImage::getUrl).toList());
+        fillCollectionNav(vo, article);
         return vo;
+    }
+
+    /**
+     * 文章若属于某合集，按合集内创建时间顺序填充上一篇（更早）/下一篇（更晚）。
+     * 结果随详情一起缓存；文章增删改会失效文章缓存，故导航不会读到脏数据。
+     */
+    private void fillCollectionNav(ArticleWebDetailVO vo, Article article) {
+        if (article.getCollectionId() == null || article.getCreateTime() == null) {
+            return;
+        }
+        Article prev = lambdaQuery()
+                .eq(Article::getCollectionId, article.getCollectionId())
+                .eq(Article::getStatus, STATUS_PUBLISHED)
+                .lt(Article::getCreateTime, article.getCreateTime())
+                .orderByDesc(Article::getCreateTime)
+                .last("LIMIT 1")
+                .one();
+        Article next = lambdaQuery()
+                .eq(Article::getCollectionId, article.getCollectionId())
+                .eq(Article::getStatus, STATUS_PUBLISHED)
+                .gt(Article::getCreateTime, article.getCreateTime())
+                .orderByAsc(Article::getCreateTime)
+                .last("LIMIT 1")
+                .one();
+        if (prev != null) {
+            vo.setPrevArticle(new ArticleNavVO(prev.getId(), prev.getTitle()));
+        }
+        if (next != null) {
+            vo.setNextArticle(new ArticleNavVO(next.getId(), next.getTitle()));
+        }
     }
 
     @Override
     public List<ArchiveMonthVO> listArchive() {
+        JavaType archiveType = objectMapper.getTypeFactory()
+                .constructCollectionType(List.class, ArchiveMonthVO.class);
+        return redisCacheService.getOrLoad(RedisKeys.cache("article:archive"), archiveType, ARCHIVE_CACHE_TTL, this::loadArchive);
+    }
+
+    private List<ArchiveMonthVO> loadArchive() {
         List<Article> articles = list(new LambdaQueryWrapper<Article>()
                 .eq(Article::getStatus, STATUS_PUBLISHED)
                 .orderByDesc(Article::getCreateTime));
@@ -115,6 +206,48 @@ public class ArticleApiServiceImpl extends ServiceImpl<ArticleMapper, Article> i
                     return vo;
                 })
                 .toList();
+    }
+
+    @Override
+    public List<ArticleCardVO> listHot(int limit) {
+        int safe = Math.min(Math.max(limit, 1), 20);
+        List<Article> articles = list(new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, STATUS_PUBLISHED)
+                .orderByDesc(Article::getViewCount)
+                .orderByDesc(Article::getCreateTime)
+                .last("LIMIT " + safe));
+        List<ArticleCardVO> records = articles.stream().map(this::toArticleCardVO).toList();
+        fillCollectionAndTags(records);
+        return records;
+    }
+
+    @Override
+    public List<ArticleCardVO> listRelated(Long id, int limit) {
+        int safe = Math.min(Math.max(limit, 1), 20);
+        // 当前文章的标签
+        List<Long> tagIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>()
+                        .eq(ArticleTag::getArticleId, id))
+                .stream().map(ArticleTag::getTagId).distinct().toList();
+        if (tagIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        // 共享这些标签、且非自身的文章ID
+        List<Long> relatedIds = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>()
+                        .in(ArticleTag::getTagId, tagIds)
+                        .ne(ArticleTag::getArticleId, id))
+                .stream().map(ArticleTag::getArticleId).distinct().toList();
+        if (relatedIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Article> articles = list(new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, STATUS_PUBLISHED)
+                .in(Article::getId, relatedIds)
+                .orderByDesc(Article::getViewCount)
+                .orderByDesc(Article::getCreateTime)
+                .last("LIMIT " + safe));
+        List<ArticleCardVO> records = articles.stream().map(this::toArticleCardVO).toList();
+        fillCollectionAndTags(records);
+        return records;
     }
 
     private List<Long> getPublishedArticleIdsByTag(Long tagId) {
@@ -227,10 +360,7 @@ public class ArticleApiServiceImpl extends ServiceImpl<ArticleMapper, Article> i
         ));
     }
 
-    private void increaseViewCount(Article article) {
-        Article update = new Article();
-        update.setId(article.getId());
-        update.setViewCount(article.getViewCount() == null ? 1L : article.getViewCount() + 1);
-        updateById(update);
+    private String normalize(Object value) {
+        return value == null ? "_" : value.toString().trim();
     }
 }

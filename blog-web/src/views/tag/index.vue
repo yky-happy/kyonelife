@@ -4,6 +4,9 @@ import { RouterLink } from 'vue-router'
 import { getTagList } from '../../api/tag'
 import type { TagItem } from '../../api/types'
 import { trackEvent } from '../../utils/tracker'
+import { setPageHeader } from '../../composables/pageHeader'
+import { setMeta } from '../../utils/seo'
+import SideBar from '../../components/SideBar.vue'
 
 const tags = ref<TagItem[]>([])
 const loading = ref(false)
@@ -21,32 +24,38 @@ async function loadTags() {
   }
 }
 
-onMounted(loadTags)
+onMounted(() => {
+  setPageHeader({ type: 'page', title: '标签', subtitle: '用关键词找到同类的文章', songTitle: true })
+  setMeta({ title: '标签' })
+  loadTags()
+})
 </script>
 
 <template>
-  <section class="plain-page">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">tags</p>
-        <h1>标签星图</h1>
-      </div>
-    </div>
+  <div class="ky-layout no-aside-mobile">
+    <main class="ky-main">
+      <div class="ky-card ky-page">
+        <div class="ky-page-head">
+          <p class="eyebrow">tags</p>
+        </div>
 
-    <div v-if="loading" class="state-card">正在整理星图...</div>
-    <div v-else-if="error" class="state-card">{{ error }}</div>
-    <div v-else class="tag-cloud">
-      <RouterLink
-        v-for="tag in tags"
-        :key="tag.id"
-        :to="`/tag/${tag.id}`"
-        class="tag-bubble"
-        :style="{ '--tag-color': tag.color || '#6bbf8a' }"
-        @click="trackEvent('tag_click', { tagId: tag.id, pageUrl: `/tag/${tag.id}` })"
-      >
-        <strong>{{ tag.name }}</strong>
-        <span>{{ tag.articleCount }} 篇文章</span>
-      </RouterLink>
-    </div>
-  </section>
+        <div v-if="loading" class="ky-state">正在整理标签…</div>
+        <div v-else-if="error" class="ky-state">{{ error }}</div>
+        <div v-else-if="!tags.length" class="ky-state">还没有标签。</div>
+        <div v-else class="tag-cloud">
+          <RouterLink
+            v-for="tag in tags"
+            :key="tag.id"
+            :to="`/tag/${tag.id}`"
+            :style="{ color: tag.color || 'var(--ky-theme)' }"
+            @click="trackEvent('tag_click', { tagId: tag.id, pageUrl: `/tag/${tag.id}` })"
+          >
+            {{ tag.name }}
+          </RouterLink>
+        </div>
+      </div>
+    </main>
+
+    <SideBar />
+  </div>
 </template>

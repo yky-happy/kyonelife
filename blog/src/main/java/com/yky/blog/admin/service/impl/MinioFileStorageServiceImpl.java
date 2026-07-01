@@ -62,11 +62,11 @@ public class MinioFileStorageServiceImpl implements FileStorageService {
         String extension = getExtension(originalFilename);
         String objectName = buildObjectName(safeDir, extension);
 
-        try {
+        try (java.io.InputStream in = file.getInputStream()) {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(minioProperties.getBucket())
                     .object(objectName)
-                    .stream(file.getInputStream(), file.getSize(), -1)
+                    .stream(in, file.getSize(), -1)
                     .contentType(file.getContentType())
                     .build());
         } catch (Exception e) {
@@ -75,6 +75,51 @@ public class MinioFileStorageServiceImpl implements FileStorageService {
 
         String url = buildUrl(objectName);
         return new FileUploadVO(url, objectName, originalFilename, file.getSize());
+    }
+
+    @Override
+    public java.util.List<com.yky.blog.admin.vo.FileItemVO> listFiles(String dir, int limit) {
+        int safe = Math.min(Math.max(limit, 1), 500);
+        String prefix = StringUtils.hasText(dir) ? dir + "/" : "";
+        java.util.List<com.yky.blog.admin.vo.FileItemVO> items = new java.util.ArrayList<>();
+        try {
+            Iterable<io.minio.Result<io.minio.messages.Item>> objects = minioClient.listObjects(
+                    io.minio.ListObjectsArgs.builder()
+                            .bucket(minioProperties.getBucket())
+                            .prefix(prefix)
+                            .recursive(true)
+                            .maxKeys(safe)
+                            .build());
+            for (io.minio.Result<io.minio.messages.Item> r : objects) {
+                io.minio.messages.Item item = r.get();
+                if (item.isDir()) {
+                    continue;
+                }
+                items.add(new com.yky.blog.admin.vo.FileItemVO(
+                        item.objectName(),
+                        buildUrl(item.objectName()),
+                        item.size(),
+                        item.lastModified() == null ? null : item.lastModified().toString()));
+            }
+        } catch (Exception e) {
+            throw new BizException("获取文件列表失败");
+        }
+        return items;
+    }
+
+    @Override
+    public void deleteFile(String objectName) {
+        if (!StringUtils.hasText(objectName)) {
+            throw new BizException("objectName 不能为空");
+        }
+        try {
+            minioClient.removeObject(io.minio.RemoveObjectArgs.builder()
+                    .bucket(minioProperties.getBucket())
+                    .object(objectName)
+                    .build());
+        } catch (Exception e) {
+            throw new BizException("删除文件失败");
+        }
     }
 
     private void validateFile(MultipartFile file,

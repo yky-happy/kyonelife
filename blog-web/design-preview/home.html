@@ -1,0 +1,279 @@
+<!-- @dsCard group="Pages" -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kyonelife · 首页重设计预览</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1b1a17;
+    --ink-soft: #4a4742;
+    --muted: #908a80;
+    --faint: #b8b2a8;
+    --paper: #f6f3ec;
+    --paper-2: #efeae0;
+    --card: #fffdf9;
+    --line: #e4ddd0;
+    --accent: #b8503c;        /* 单一精致强调：陶土红，仅点缀使用 */
+    --accent-soft: #f0e3dd;
+    --serif: "Fraunces", "Noto Serif SC", Georgia, serif;
+    --serif-cn: "Noto Serif SC", "Songti SC", serif;
+    --sans: "Inter", "Noto Sans SC", system-ui, sans-serif;
+    --radius: 18px;
+    --radius-lg: 26px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink-soft);
+    background:
+      radial-gradient(circle at 85% -5%, rgba(184,80,60,.06), transparent 40%),
+      linear-gradient(180deg, #f8f5ef 0%, var(--paper) 60%);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  ::selection { background: var(--accent); color: #fff; }
+  .wrap { width: min(1160px, calc(100% - 48px)); margin: 0 auto; }
+
+  /* ===== 顶栏 ===== */
+  .site-header {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 0; margin-bottom: 8px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 42px; height: 42px; border-radius: 13px;
+    background: var(--ink); color: var(--paper);
+    display: grid; place-items: center;
+    font-family: var(--serif); font-size: 22px; font-weight: 600;
+  }
+  .brand-name { font-family: var(--serif); font-size: 21px; font-weight: 600; color: var(--ink); letter-spacing: .2px; }
+  .brand-sub { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--faint); }
+  .site-nav { display: flex; gap: 34px; align-items: center; }
+  .site-nav a { font-size: 14.5px; color: var(--ink-soft); position: relative; transition: color .2s; }
+  .site-nav a::after {
+    content: ""; position: absolute; left: 0; bottom: -6px; width: 0; height: 1.5px;
+    background: var(--accent); transition: width .25s ease;
+  }
+  .site-nav a:hover { color: var(--ink); }
+  .site-nav a:hover::after, .site-nav a.active::after { width: 100%; }
+  .site-nav a.active { color: var(--ink); }
+
+  /* ===== 英雄区：超大编辑式排版 ===== */
+  .hero { padding: 56px 0 64px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); font-weight: 500;
+  }
+  .eyebrow::before { content: ""; width: 28px; height: 1px; background: var(--accent); }
+  .hero h1 {
+    font-family: var(--serif); font-weight: 500;
+    font-size: clamp(38px, 5vw, 62px); line-height: 1.08; color: var(--ink);
+    letter-spacing: -.5px; margin: 22px 0 24px;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero-text { font-size: 16.5px; color: var(--muted); max-width: 44ch; }
+  .hero-actions { display: flex; gap: 16px; margin-top: 34px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 13px 26px; border-radius: 999px; font-size: 14.5px; font-weight: 500;
+    transition: all .22s ease; cursor: pointer; border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+  .btn-ghost { color: var(--ink); border-color: var(--line); }
+  .btn-ghost:hover { border-color: var(--ink); }
+
+  .hero-visual { position: relative; }
+  .hero-img {
+    aspect-ratio: 4/5; border-radius: var(--radius-lg); overflow: hidden;
+    background:
+      radial-gradient(circle at 30% 25%, #f3c98a, transparent 55%),
+      radial-gradient(circle at 75% 70%, #c97b62, transparent 50%),
+      linear-gradient(160deg, #2b2620, #5a4a3a);
+    box-shadow: 0 40px 80px rgba(60,45,30,.22);
+  }
+  .hero-badge {
+    position: absolute; left: -22px; bottom: 34px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 14px 18px; box-shadow: 0 20px 44px rgba(60,45,30,.14);
+    max-width: 220px;
+  }
+  .hero-badge span { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--faint); }
+  .hero-badge strong { display: block; font-family: var(--serif-cn); font-size: 15px; color: var(--ink); margin-top: 5px; font-weight: 600; }
+
+  /* ===== 区块标题 ===== */
+  .section { padding: 50px 0; }
+  .section-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 36px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+  .section-head h2 { font-family: var(--serif); font-weight: 500; font-size: 30px; color: var(--ink); letter-spacing: -.3px; }
+  .text-link { font-size: 14px; color: var(--accent); display: inline-flex; gap: 7px; align-items: center; transition: gap .2s; }
+  .text-link:hover { gap: 12px; }
+
+  /* ===== 精选条 ===== */
+  .featured { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .feat {
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 22px 24px;
+    background: var(--card); transition: all .25s ease; cursor: pointer;
+  }
+  .feat:hover { transform: translateY(-4px); box-shadow: 0 24px 50px rgba(60,45,30,.1); border-color: transparent; }
+  .feat span { font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  .feat strong { display: block; font-family: var(--serif-cn); font-size: 18px; line-height: 1.45; color: var(--ink); margin-top: 12px; font-weight: 600; }
+
+  /* ===== 文章网格 ===== */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    overflow: hidden; cursor: pointer; transition: all .3s cubic-bezier(.2,.7,.3,1);
+    display: flex; flex-direction: column;
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 34px 64px rgba(60,45,30,.14); border-color: transparent; }
+  .card-cover { aspect-ratio: 16/9; position: relative; overflow: hidden; }
+  .card-cover .ph {
+    position: absolute; inset: 0;
+    background: linear-gradient(150deg, #d9b27a, #a8623f);
+    transition: transform .5s ease;
+  }
+  .card:nth-child(2) .ph { background: linear-gradient(150deg, #8fb6a8, #3f6b5f); }
+  .card:nth-child(3) .ph { background: linear-gradient(150deg, #b0a4cf, #5a4a86); }
+  .card:nth-child(4) .ph { background: linear-gradient(150deg, #e0a99a, #9c5a55); }
+  .card:hover .ph { transform: scale(1.06); }
+  .pin {
+    position: absolute; top: 14px; left: 14px; background: rgba(27,26,23,.78); color: #fff;
+    font-size: 11px; padding: 4px 11px; border-radius: 999px; backdrop-filter: blur(6px);
+  }
+  .card-body { padding: 24px 26px 26px; display: flex; flex-direction: column; flex: 1; }
+  .meta { display: flex; gap: 14px; font-size: 12.5px; color: var(--faint); margin-bottom: 13px; }
+  .card-body h3 { font-family: var(--serif-cn); font-weight: 600; font-size: 21px; line-height: 1.4; color: var(--ink); }
+  .card-body p { font-size: 14.5px; color: var(--muted); margin-top: 11px; flex: 1; }
+  .tags { display: flex; gap: 9px; margin-top: 18px; flex-wrap: wrap; }
+  .chip { font-size: 12px; padding: 4px 13px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-soft); }
+  .chip.coll { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+
+  .more-row { display: flex; justify-content: center; margin-top: 48px; }
+
+  /* ===== 页脚 ===== */
+  .site-footer {
+    margin-top: 40px; padding: 50px 0; border-top: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .site-footer .f-quote { font-family: var(--serif-cn); font-size: 17px; color: var(--ink); }
+  .site-footer .f-name { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--faint); }
+
+  @media (max-width: 880px) {
+    .hero { grid-template-columns: 1fr; gap: 36px; }
+    .hero-visual { order: -1; max-width: 360px; }
+    .featured { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr; }
+    .site-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site-header">
+      <a class="brand" href="#">
+        <span class="brand-mark">K</span>
+        <span>
+          <div class="brand-name">Kyonelife</div>
+          <div class="brand-sub">planet journal</div>
+        </span>
+      </a>
+      <nav class="site-nav">
+        <a href="#" class="active">首页</a>
+        <a href="#">标签</a>
+        <a href="#">合集</a>
+        <a href="#">归档</a>
+        <a href="#">关于</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">planet journal</span>
+        <h1>把日常里的微光,<br>整理成可以<em>再次出发</em>的文章。</h1>
+        <p class="hero-text">这里记录技术、生活与思考。愿每篇文章都像一次星际停靠——带着好奇,也带着一点柔软。</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#">阅读文章 →</a>
+          <a class="btn btn-ghost" href="#">查看归档</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-img"></div>
+        <div class="hero-badge">
+          <span>today's orbit</span>
+          <strong>写一点清醒,也写一点温柔。</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:20px;">
+      <div class="featured">
+        <a class="feat" href="#"><span>星球札记</span><strong>用 Redis 给博客做数据聚合缓存</strong></a>
+        <a class="feat" href="#"><span>全栈手记</span><strong>从零搭建埋点系统的踩坑记录</strong></a>
+        <a class="feat" href="#"><span>运维日常</span><strong>MinIO 操作日志与运行日志分析</strong></a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">latest notes</span>
+          <h2 style="margin-top:14px;">文章列表</h2>
+        </div>
+        <a class="text-link" href="#">按标签浏览 →</a>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="card-cover"><div class="ph"></div><span class="pin">置顶</span></div>
+          <div class="card-body">
+            <div class="meta"><span>2026 · 06 · 23</span><span>1.2k 阅读</span></div>
+            <h3>用 Redis 给博客做数据聚合缓存</h3>
+            <p>把热点数据从数据库前移到缓存层,聊聊聚合、过期与一致性的取舍。</p>
+            <div class="tags"><span class="chip coll">后端</span><span class="chip">Redis</span><span class="chip">性能</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-cover"><div class="ph"></div></div>
+          <div class="card-body">
+            <div class="meta"><span>2026 · 06 · 24</span><span>980 阅读</span></div>
+            <h3>从零搭建埋点系统的踩坑记录</h3>
+            <p>一套轻量埋点是怎么落地的:采集、上报、清洗,以及那些半夜的 bug。</p>
+            <div class="tags"><span class="chip coll">全栈</span><span class="chip">埋点</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-cover"><div class="ph"></div></div>
+          <div class="card-body">
+            <div class="meta"><span>2026 · 06 · 09</span><span>710 阅读</span></div>
+            <h3>MinIO 操作日志与运行日志分析</h3>
+            <p>对象存储的可观测性实践,把"发生了什么"变成可检索的结构化日志。</p>
+            <div class="tags"><span class="chip coll">运维</span><span class="chip">MinIO</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-cover"><div class="ph"></div></div>
+          <div class="card-body">
+            <div class="meta"><span>2026 · 06 · 02</span><span>560 阅读</span></div>
+            <h3>博客去同质化的最终改进方向</h3>
+            <p>当所有模板都长一个样,如何让自己的博客重新拥有"人味"与记忆点。</p>
+            <div class="tags"><span class="chip coll">产品</span><span class="chip">设计</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="more-row"><a class="btn btn-ghost" href="#">继续探索</a></div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="f-quote">守护一朵玫瑰,也记录每一次远行。</span>
+      <span class="f-name">Kyonelife Blog</span>
+    </footer>
+  </div>
+</body>
+</html>

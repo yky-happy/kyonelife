@@ -1,0 +1,11 @@
+# 构建产物与本地垃圾不进构建上下文，加快构建、避免泄漏
+target/
+logs/
+*.log
+.git
+.gitignore
+.idea/
+*.iml
+HELP.md
+# dev 环境密钥文件（已 gitignore），确保绝不进镜像
+src/main/resources/application-dev.yml

@@ -15,8 +15,12 @@ public class User extends BaseEntity {
 
     @TableId(type = IdType.AUTO)
     private Long id;
+    private String account;
     private String phone;
+    private String email;
+    private String password;
     private String nickname;
+    private String avatar;
     private Integer status;
     private String ip;
     private String ipLocation;

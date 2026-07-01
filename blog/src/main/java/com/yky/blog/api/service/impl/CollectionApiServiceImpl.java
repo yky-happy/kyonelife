@@ -3,6 +3,8 @@ package com.yky.blog.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yky.blog.api.dto.ArticleCardVO;
 import com.yky.blog.api.dto.CollectionApiVO;
 import com.yky.blog.api.service.ArticleApiService;
@@ -12,11 +14,14 @@ import com.yky.blog.common.entity.Collection;
 import com.yky.blog.common.exception.BizException;
 import com.yky.blog.common.mapper.ArticleMapper;
 import com.yky.blog.common.mapper.CollectionMapper;
+import com.yky.blog.common.redis.RedisCacheService;
+import com.yky.blog.common.redis.RedisKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +32,20 @@ import java.util.stream.Collectors;
 public class CollectionApiServiceImpl extends ServiceImpl<CollectionMapper, Collection> implements CollectionApiService {
 
     private static final int STATUS_PUBLISHED = 1;
+    private static final Duration COLLECTION_LIST_CACHE_TTL = Duration.ofMinutes(3);
 
     private final ArticleMapper articleMapper;
     private final ArticleApiService articleApiService;
+    private final RedisCacheService redisCacheService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public List<CollectionApiVO> listCollections() {
+        JavaType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, CollectionApiVO.class);
+        return redisCacheService.getOrLoad(RedisKeys.cache("collection:list"), listType, COLLECTION_LIST_CACHE_TTL, this::loadCollections);
+    }
+
+    private List<CollectionApiVO> loadCollections() {
         List<Collection> collections = list(new LambdaQueryWrapper<Collection>()
                 .orderByAsc(Collection::getSort)
                 .orderByDesc(Collection::getCreateTime));

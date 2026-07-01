@@ -1,35 +1,63 @@
+# ============================================================
+# 共享配置（不含任何密钥）。
+# 环境相关的数据库/Redis/MinIO 连接放在 application-{profile}.yml：
+#   - dev  : 本地开发（application-dev.yml，已 gitignore，含本地账号密码）
+#   - prod : 生产部署（application-prod.yml，全部走环境变量，无明文密钥）
+# 通过 SPRING_PROFILES_ACTIVE 切换，默认 dev。
+# ============================================================
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   application:
     name: blog
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 110MB
+  # 数据库连接池（HikariCP）。连接信息在各 profile，这里只放与环境无关的池化参数。
   datasource:
-    url: jdbc:mysql://localhost:3306/kyonelife?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
-    username: root
-    password: ***REMOVED***
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_POOL_CONN_TIMEOUT:30000}
+      idle-timeout: ${DB_POOL_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_POOL_MAX_LIFETIME:1800000}
   data:
     redis:
-      host: localhost
-      port: 6379
+      # 命令执行超时，避免 Redis 抖动时请求线程被长时间挂起
+      timeout: ${REDIS_TIMEOUT:3000}
+      lettuce:
+        pool:
+          max-active: ${REDIS_POOL_MAX_ACTIVE:20}
+          max-idle: ${REDIS_POOL_MAX_IDLE:10}
+          min-idle: ${REDIS_POOL_MIN_IDLE:5}
+          max-wait: ${REDIS_POOL_MAX_WAIT:2000}
+        shutdown-timeout: ${REDIS_SHUTDOWN_TIMEOUT:2000}
+  # AI 大模型（Spring AI + DeepSeek）。API Key 走环境变量 DEEPSEEK_API_KEY（dev 也可直接写进 application-dev.yml）。
+  # 未配置真实 Key 时应用仍可正常启动，AI 接口会自动降级为本地规则结果。
+  ai:
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:sk-please-set-DEEPSEEK_API_KEY}
+      chat:
+        options:
+          model: ${DEEPSEEK_MODEL:deepseek-chat}
+          temperature: 0.7
 
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      logic-delete-field: deleted
-      logic-delete-value: 1
-      logic-not-delete-value: 0
+    # 生产用 prod profile 覆盖为 NoLoggingImpl，避免 SQL 刷屏
+    log-impl: ${MYBATIS_LOG_IMPL:org.apache.ibatis.logging.stdout.StdOutImpl}
 
 sa-token:
   token-name: Authorization
-  timeout: 2592000
+  # 登录态有效期，默认 7 天（原 30 天过长，泄露窗口大）；可用 SA_TOKEN_TIMEOUT 覆盖
+  timeout: ${SA_TOKEN_TIMEOUT:604800}
+  # 连续 1 天无操作即过期（滑动续期），降低 token 泄露后的可用时间
+  active-timeout: ${SA_TOKEN_ACTIVE_TIMEOUT:86400}
   is-concurrent: false
 
 springdoc:
@@ -40,42 +68,24 @@ springdoc:
   packages-to-scan: com.yky.blog
 
 knife4j:
-  enable: true
+  enable: ${KNIFE4J_ENABLE:true}
 
+# MinIO 非敏感配置（桶名、大小、白名单）；endpoint 与密钥在各 profile 中配置
 minio:
-  endpoint: http://localhost:9000
-  public-endpoint: http://localhost:9000
-  access-key: kyonelife
-  secret-key: kyonelife123456
-  bucket: kyonelife
+  bucket: ${MINIO_BUCKET:kyonelife}
   image-max-size: 5242880
   video-max-size: 104857600
-  allowed-image-extensions:
-    - jpg
-    - jpeg
-    - png
-    - webp
-    - gif
-  allowed-image-content-types:
-    - image/jpeg
-    - image/png
-    - image/webp
-    - image/gif
-  allowed-video-extensions:
-    - mp4
-    - webm
-    - mov
-  allowed-video-content-types:
-    - video/mp4
-    - video/webm
-    - video/quicktime
+  allowed-image-extensions: [jpg, jpeg, png, webp, gif]
+  allowed-image-content-types: [image/jpeg, image/png, image/webp, image/gif]
+  allowed-video-extensions: [mp4, webm, mov]
+  allowed-video-content-types: [video/mp4, video/webm, video/quicktime]
 
 logging:
   file:
-    name: logs/kyonelife-blog.log
+    name: ${LOG_FILE:logs/kyonelife-blog.log}
   level:
     root: info
-    com.yky.blog: debug
+    com.yky.blog: ${LOG_LEVEL_APP:debug}
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} - %msg%n"

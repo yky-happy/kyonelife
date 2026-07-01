@@ -28,4 +28,8 @@ public class Article extends BaseEntity {
     private Integer isOriginal;
     private String originalUrl;
     private Long viewCount;
+    private Long likeCount;
+    // IGNORED：updateById 时总是写该列（含 null），使"定时改立即"能清空 publish_time
+    @com.baomidou.mybatisplus.annotation.TableField(updateStrategy = com.baomidou.mybatisplus.annotation.FieldStrategy.IGNORED)
+    private java.time.LocalDateTime publishTime;
 }

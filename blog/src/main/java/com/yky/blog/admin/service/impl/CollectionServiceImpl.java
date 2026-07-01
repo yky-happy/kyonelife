@@ -9,11 +9,16 @@ import com.yky.blog.admin.vo.CollectionVO;
 import com.yky.blog.common.entity.Collection;
 import com.yky.blog.common.exception.BizException;
 import com.yky.blog.common.mapper.CollectionMapper;
+import com.yky.blog.common.redis.ArticleCacheEvictor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CollectionServiceImpl extends ServiceImpl<CollectionMapper, Collection> implements CollectionService {
+
+    private final ArticleCacheEvictor articleCacheEvictor;
 
     @Override
     public IPage<CollectionVO> pageCollection(int page, int size, String keyword) {
@@ -36,11 +41,14 @@ public class CollectionServiceImpl extends ServiceImpl<CollectionMapper, Collect
         BeanUtils.copyProperties(dto, collection);
         collection.setId(id);
         updateById(collection);
+        // 合集名称变更会影响文章卡片上的合集展示，失效文章缓存
+        articleCacheEvictor.evictAll();
     }
 
     @Override
     public void removeCollection(Long id) {
         removeById(id);
+        articleCacheEvictor.evictAll();
     }
 
     private void checkNameDuplicate(String name, Long excludeId) {

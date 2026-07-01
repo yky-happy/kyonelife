@@ -1,5 +1,6 @@
 package com.yky.blog.admin.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.yky.blog.admin.service.RuntimeLogService;
 import com.yky.blog.admin.vo.RuntimeLogApiMetricVO;
 import com.yky.blog.admin.vo.RuntimeLogLineVO;
@@ -25,6 +26,7 @@ public class RuntimeLogController {
     private final RuntimeLogService runtimeLogService;
 
     @Operation(summary = "最近运行日志")
+    @SaCheckPermission("runtime-log:list")
     @GetMapping("/recent")
     public Result<List<RuntimeLogLineVO>> recent(@RequestParam(defaultValue = "200") int lines,
                                                  @RequestParam(required = false) String level) {
@@ -32,6 +34,7 @@ public class RuntimeLogController {
     }
 
     @Operation(summary = "搜索运行日志")
+    @SaCheckPermission("runtime-log:list")
     @GetMapping("/search")
     public Result<List<RuntimeLogLineVO>> search(@RequestParam(required = false) String keyword,
                                                  @RequestParam(required = false) String level,
@@ -40,12 +43,14 @@ public class RuntimeLogController {
     }
 
     @Operation(summary = "运行状态概览")
+    @SaCheckPermission("runtime-log:list")
     @GetMapping("/summary")
     public Result<RuntimeLogSummaryVO> summary(@RequestParam(defaultValue = "100") long slowThreshold) {
         return Result.success(runtimeLogService.summary(slowThreshold));
     }
 
     @Operation(summary = "慢请求列表")
+    @SaCheckPermission("runtime-log:list")
     @GetMapping("/slow-requests")
     public Result<List<RuntimeLogSlowRequestVO>> slowRequests(@RequestParam(defaultValue = "100") long threshold,
                                                               @RequestParam(defaultValue = "10") int limit) {
@@ -53,6 +58,7 @@ public class RuntimeLogController {
     }
 
     @Operation(summary = "接口访问排行")
+    @SaCheckPermission("runtime-log:list")
     @GetMapping("/top-apis")
     public Result<List<RuntimeLogApiMetricVO>> topApis(@RequestParam(defaultValue = "10") int limit) {
         return Result.success(runtimeLogService.topApis(limit));

@@ -28,11 +28,30 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<spring-ai.version>1.0.9</spring-ai.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Spring AI 物料清单，统一管理 AI 相关依赖版本 -->
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+		<!-- Lettuce 连接池支持（spring.data.redis.lettuce.pool 需要 commons-pool2 才生效） -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -74,6 +93,12 @@
 			<artifactId>sa-token-spring-boot3-starter</artifactId>
 			<version>1.37.0</version>
 		</dependency>
+		<!-- Sa-Token 整合 Redis（登录态持久化，重启不丢、长期有效）-->
+		<dependency>
+			<groupId>cn.dev33</groupId>
+			<artifactId>sa-token-redis-jackson</artifactId>
+			<version>1.37.0</version>
+		</dependency>
 		<!-- Knife4j -->
 		<dependency>
 			<groupId>com.github.xiaoymin</groupId>
@@ -90,6 +115,22 @@
 			<groupId>io.minio</groupId>
 			<artifactId>minio</artifactId>
 			<version>8.5.2</version>
+		</dependency>
+		<!-- ip2region 离线 IP 地理位置库 -->
+		<dependency>
+			<groupId>org.lionsoul</groupId>
+			<artifactId>ip2region</artifactId>
+			<version>2.7.0</version>
+		</dependency>
+		<!-- 邮件（邮箱验证码登录）-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<!-- Spring AI DeepSeek（AI 内容辅助：摘要生成、标签推荐）-->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-deepseek</artifactId>
 		</dependency>
 	</dependencies>
 

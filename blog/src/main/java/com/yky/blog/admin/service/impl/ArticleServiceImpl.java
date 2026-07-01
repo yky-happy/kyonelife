@@ -10,21 +10,30 @@ import com.yky.blog.admin.vo.ArticleDetailVO;
 import com.yky.blog.admin.vo.ArticleVO;
 import com.yky.blog.admin.vo.TagVO;
 import com.yky.blog.common.entity.Article;
+import com.yky.blog.common.entity.ArticleImage;
 import com.yky.blog.common.entity.ArticleTag;
 import com.yky.blog.common.entity.Collection;
 import com.yky.blog.common.entity.Tag;
 import com.yky.blog.common.exception.BizException;
+import com.yky.blog.common.mapper.ArticleImageMapper;
 import com.yky.blog.common.mapper.ArticleMapper;
 import com.yky.blog.common.mapper.ArticleTagMapper;
 import com.yky.blog.common.mapper.CollectionMapper;
 import com.yky.blog.common.mapper.TagMapper;
+import com.yky.blog.common.redis.ArticleCacheEvictor;
+import com.yky.blog.common.redis.DistributedLock;
+import com.yky.blog.common.redis.RedisKeys;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -35,13 +44,17 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
 
     private final ArticleTagMapper articleTagMapper;
+    private final ArticleImageMapper articleImageMapper;
     private final CollectionMapper collectionMapper;
     private final TagMapper tagMapper;
+    private final ArticleCacheEvictor articleCacheEvictor;
+    private final DistributedLock distributedLock;
 
     @Override
     public IPage<ArticleVO> pageArticle(int page, int size, String keyword, Integer status) {
@@ -76,6 +89,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         vo.setTagIds(vo.getTags() == null
                 ? Collections.emptyList()
                 : vo.getTags().stream().map(TagVO::getId).toList());
+        vo.setImages(loadArticleImages(id));
         return vo;
     }
 
@@ -88,8 +102,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Article article = new Article();
         BeanUtils.copyProperties(dto, article);
         fillDefaults(article);
+        applyScheduledPublish(article, dto);
         save(article);
         saveArticleTags(article.getId(), dto.getTagIds());
+        saveArticleImages(article.getId(), dto.getImages());
+        articleCacheEvictor.evictAll();
         return article.getId();
     }
 
@@ -106,12 +123,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         BeanUtils.copyProperties(dto, article);
         article.setId(id);
         fillDefaults(article);
+        applyScheduledPublish(article, dto);
         updateById(article);
         deleteArticleTags(id);
         saveArticleTags(id, dto.getTagIds());
+        deleteArticleImages(id);
+        saveArticleImages(id, dto.getImages());
+        articleCacheEvictor.evictAll();
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateArticleStatus(Long id, Integer status) {
         if (getById(id) == null) {
             throw new BizException("文章不存在");
@@ -121,6 +143,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setId(id);
         article.setStatus(status);
         updateById(article);
+        // 缓存失效注册在事务提交后执行，保证 DB 更新成功后才清缓存
+        articleCacheEvictor.evictAll();
     }
 
     @Override
@@ -130,7 +154,75 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             throw new BizException("文章不存在");
         }
         deleteArticleTags(id);
+        deleteArticleImages(id);
         removeById(id);
+        articleCacheEvictor.evictAll();
+    }
+
+    /**
+     * 定时发布：若 publishTime 是未来时间，则先存为草稿，到点由定时任务转发布；
+     * 否则清空 publishTime 立即按所选状态生效。
+     */
+    private void applyScheduledPublish(Article article, ArticleSaveDTO dto) {
+        LocalDateTime pt = dto.getPublishTime();
+        if (pt != null && pt.isAfter(LocalDateTime.now())) {
+            article.setStatus(0);
+            article.setPublishTime(pt);
+        } else {
+            article.setPublishTime(null);
+        }
+    }
+
+    /** 每分钟检查到点的定时发布文章，集群下分布式锁保证单实例执行。 */
+    @Scheduled(cron = "0 * * * * ?")
+    public void publishScheduled() {
+        distributedLock.runIfAcquired(RedisKeys.lock("article-scheduled-publish"), Duration.ofSeconds(50), () -> {
+            List<Article> due = list(new LambdaQueryWrapper<Article>()
+                    .eq(Article::getStatus, 0)
+                    .isNotNull(Article::getPublishTime)
+                    .le(Article::getPublishTime, LocalDateTime.now()));
+            if (due.isEmpty()) {
+                return;
+            }
+            for (Article a : due) {
+                Article update = new Article();
+                update.setId(a.getId());
+                update.setStatus(1);
+                update.setPublishTime(null);
+                updateById(update);
+            }
+            articleCacheEvictor.evictAll();
+            log.info("定时发布：已发布 {} 篇文章", due.size());
+        });
+    }
+
+    private void saveArticleImages(Long articleId, List<String> images) {
+        if (CollectionUtils.isEmpty(images)) {
+            return;
+        }
+        int sort = 0;
+        for (String url : images) {
+            if (!StringUtils.hasText(url)) {
+                continue;
+            }
+            ArticleImage image = new ArticleImage();
+            image.setArticleId(articleId);
+            image.setUrl(url);
+            image.setSort(sort++);
+            articleImageMapper.insert(image);
+        }
+    }
+
+    private void deleteArticleImages(Long articleId) {
+        articleImageMapper.delete(new LambdaQueryWrapper<ArticleImage>()
+                .eq(ArticleImage::getArticleId, articleId));
+    }
+
+    private List<String> loadArticleImages(Long articleId) {
+        return articleImageMapper.selectList(new LambdaQueryWrapper<ArticleImage>()
+                        .eq(ArticleImage::getArticleId, articleId)
+                        .orderByAsc(ArticleImage::getSort))
+                .stream().map(ArticleImage::getUrl).toList();
     }
 
     private ArticleVO toArticleVO(Article article) {

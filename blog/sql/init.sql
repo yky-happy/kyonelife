@@ -107,7 +107,7 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `type`, `path`, `component`, `pe
 (10, 1, '文章管理', 'MENU',    '/content/article',    'content/article/index',    NULL,             1),
 (11, 1, '合集管理', 'MENU',    '/content/collection', 'content/collection/index', NULL,             2),
 (12, 1, '标签管理', 'MENU',    '/content/tag',        'content/tag/index',        NULL,             3),
-(13, 1, '评论管理', 'MENU',    '/content/comment',    'content/comment/index',    NULL,             4),
+(13, 1, 'AI 创作助手', 'MENU', '/content/agent',      'content/agent/index',      NULL,             4),
 (14, 1, '轮播管理', 'MENU',    '/content/banner',     'content/banner/index',     NULL,             5),
 -- 系统管理 > 菜单
 (20, 2, '管理员管理', 'MENU',  '/system/admin',       'system/admin/index',       NULL,             1),
@@ -116,6 +116,10 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `type`, `path`, `component`, `pe
 (23, 2, '用户管理',   'MENU',  '/system/user',        'system/user/index',        NULL,             4),
 (24, 2, '网站配置',   'MENU',  '/system/config',      'system/config/index',      NULL,             5),
 (25, 2, '操作日志',   'MENU',  '/system/operation-log','system/operation-log/index',NULL,            6),
+(26, 2, '数据分析',   'MENU',  '/system/analytics',   'system/analytics/index',   NULL,             7),
+(27, 2, '文件管理',   'MENU',  '/system/file',        'system/file/index',        NULL,             8),
+(28, 2, '运行日志',   'MENU',  '/system/log',         'system/log/index',         NULL,             9),
+(29, 2, '仪表盘',     'MENU',  '/dashboard',          'dashboard/index',          NULL,             0),
 -- 文章管理按钮
 (100, 10, '文章列表', 'BUTTON', NULL, NULL, 'article:list',   1),
 (101, 10, '新增文章', 'BUTTON', NULL, NULL, 'article:add',    2),
@@ -131,10 +135,9 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `type`, `path`, `component`, `pe
 (121, 12, '新增标签', 'BUTTON', NULL, NULL, 'tag:add',    2),
 (122, 12, '编辑标签', 'BUTTON', NULL, NULL, 'tag:edit',   3),
 (123, 12, '删除标签', 'BUTTON', NULL, NULL, 'tag:delete', 4),
--- 评论管理按钮
-(130, 13, '评论列表', 'BUTTON', NULL, NULL, 'comment:list',   1),
-(131, 13, '隐藏评论', 'BUTTON', NULL, NULL, 'comment:hide',   2),
-(132, 13, '删除评论', 'BUTTON', NULL, NULL, 'comment:delete', 3),
+-- AI 创作助手按钮
+(130, 13, '生成选题', 'BUTTON', NULL, NULL, 'ai-agent:topics', 1),
+(131, 13, '生成草稿', 'BUTTON', NULL, NULL, 'ai-agent:draft',  2),
 -- 轮播管理按钮
 (140, 14, '轮播列表', 'BUTTON', NULL, NULL, 'banner:list',   1),
 (141, 14, '新增轮播', 'BUTTON', NULL, NULL, 'banner:add',    2),
@@ -155,8 +158,26 @@ INSERT INTO `menu` (`id`, `parent_id`, `title`, `type`, `path`, `component`, `pe
 (230, 23, '用户列表', 'BUTTON', NULL, NULL, 'user:list',   1),
 (231, 23, '封禁用户', 'BUTTON', NULL, NULL, 'user:ban',    2),
 (232, 23, '删除用户', 'BUTTON', NULL, NULL, 'user:delete', 3),
+-- 网站配置按钮
+(240, 24, '配置查看', 'BUTTON', NULL, NULL, 'config:list', 1),
+(241, 24, '配置编辑', 'BUTTON', NULL, NULL, 'config:edit', 2),
+-- 菜单管理按钮
+(220, 22, '菜单列表', 'BUTTON', NULL, NULL, 'menu:list',   1),
+(221, 22, '新增菜单', 'BUTTON', NULL, NULL, 'menu:add',    2),
+(222, 22, '编辑菜单', 'BUTTON', NULL, NULL, 'menu:edit',   3),
+(223, 22, '删除菜单', 'BUTTON', NULL, NULL, 'menu:delete', 4),
 -- 操作日志按钮
-(250, 25, '操作日志列表', 'BUTTON', NULL, NULL, 'operation-log:list', 1);
+(250, 25, '操作日志列表', 'BUTTON', NULL, NULL, 'operation-log:list', 1),
+-- 数据分析按钮
+(260, 26, '数据分析查看', 'BUTTON', NULL, NULL, 'analytics:list', 1),
+-- 文件管理按钮
+(270, 27, '文件列表', 'BUTTON', NULL, NULL, 'file:list', 1),
+(271, 27, '文件上传', 'BUTTON', NULL, NULL, 'file:upload', 2),
+(272, 27, '文件删除', 'BUTTON', NULL, NULL, 'file:delete', 3),
+-- 运行日志按钮
+(280, 28, '运行日志查看', 'BUTTON', NULL, NULL, 'runtime-log:list', 1),
+-- 仪表盘按钮
+(290, 29, '仪表盘查看', 'BUTTON', NULL, NULL, 'dashboard:list', 1);
 
 -- ---------------------------------------------------------
 -- 6. 角色菜单关联表
@@ -219,16 +240,19 @@ CREATE TABLE `article` (
   `ai_describe`   mediumtext   DEFAULT NULL              COMMENT 'AI 生成的简短描述',
   `collection_id` int          DEFAULT NULL              COMMENT '所属合集ID，NULL 表示不加入任何合集',
   `status`        tinyint      NOT NULL DEFAULT 0        COMMENT '0=草稿 1=已发布 2=已下架',
+  `publish_time`  datetime     DEFAULT NULL              COMMENT '定时发布时间，NULL 表示不定时发布',
   `is_stick`      tinyint      NOT NULL DEFAULT 0        COMMENT '是否置顶：0=否 1=是',
   `is_carousel`   tinyint      NOT NULL DEFAULT 0        COMMENT '是否加入轮播：0=否 1=是（最多5篇，应用层控制）',
   `carousel_sort` int          NOT NULL DEFAULT 0        COMMENT '轮播排序（is_carousel=1 时有效）',
   `is_original`   tinyint      NOT NULL DEFAULT 1        COMMENT '0=转载 1=原创',
   `original_url`  varchar(500) DEFAULT NULL              COMMENT '转载原文链接',
   `view_count`    bigint       NOT NULL DEFAULT 0        COMMENT '阅读量',
+  `like_count`    bigint       NOT NULL DEFAULT 0        COMMENT '点赞数',
   `create_time`   datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time`   datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FULLTEXT KEY `idx_ft_title` (`title`),
   KEY `idx_status_stick` (`status`, `is_stick`),
+  KEY `idx_publish_time` (`publish_time`),
   KEY `idx_collection` (`collection_id`),
   KEY `idx_carousel` (`is_carousel`),
   PRIMARY KEY (`id`)
@@ -260,29 +284,7 @@ CREATE TABLE `article_tag` (
 ) COMMENT '文章标签关联表';
 
 -- ---------------------------------------------------------
--- 12. 评论表（需要登录才能评论）
--- ---------------------------------------------------------
-CREATE TABLE `comment` (
-  `id`            bigint       NOT NULL AUTO_INCREMENT,
-  `article_id`    bigint       NOT NULL                 COMMENT '所属文章ID',
-  `user_id`       bigint       NOT NULL                 COMMENT '评论用户ID（关联 user.id）',
-  `content`       text         NOT NULL                 COMMENT '评论内容',
-  `parent_id`     bigint       DEFAULT NULL             COMMENT '父评论ID，NULL 表示顶级评论',
-  `reply_user_id` bigint       DEFAULT NULL             COMMENT '被回复用户ID',
-  `ip`            varchar(50)  DEFAULT NULL             COMMENT '评论者 IP',
-  `ip_location`   varchar(100) DEFAULT NULL             COMMENT 'IP 归属地',
-  `browser`       varchar(100) DEFAULT NULL             COMMENT '浏览器信息',
-  `os`            varchar(100) DEFAULT NULL             COMMENT '操作系统信息',
-  `status`        tinyint      NOT NULL DEFAULT 1       COMMENT '0=隐藏 1=正常',
-  `create_time`   datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `idx_article_id` (`article_id`),
-  KEY `idx_user_id` (`user_id`),
-  KEY `idx_parent_id` (`parent_id`),
-  PRIMARY KEY (`id`)
-) COMMENT '评论表';
-
--- ---------------------------------------------------------
--- 13. 轮播图表（文章轮播数为 0 时展示）
+-- 12. 轮播图表（文章轮播数为 0 时展示）
 -- ---------------------------------------------------------
 CREATE TABLE `banner` (
   `id`          int          NOT NULL AUTO_INCREMENT,
@@ -373,3 +375,110 @@ CREATE TABLE `event_log` (
   KEY `idx_article_time` (`article_id`, `create_time`),
   KEY `idx_create_time` (`create_time`)
 ) COMMENT '前台行为埋点明细表';
+
+-- ---------------------------------------------------------
+-- 17. 前台行为每日聚合表
+-- ---------------------------------------------------------
+CREATE TABLE `event_daily_stat` (
+  `id`             bigint       NOT NULL AUTO_INCREMENT,
+  `stat_date`      date         NOT NULL                 COMMENT '统计日期',
+  `event_type`     varchar(50)  NOT NULL                 COMMENT '事件类型',
+  `pv`             bigint       NOT NULL DEFAULT 0       COMMENT '事件次数',
+  `uv`             bigint       NOT NULL DEFAULT 0       COMMENT '去重访客数',
+  `duration_total` bigint       NOT NULL DEFAULT 0       COMMENT '累计停留时长，毫秒',
+  `create_time`    datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`    datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_date_event` (`stat_date`, `event_type`),
+  KEY `idx_event_date` (`event_type`, `stat_date`)
+) COMMENT '前台行为每日聚合表';
+
+-- ---------------------------------------------------------
+-- 18. 文章每日聚合表
+-- ---------------------------------------------------------
+CREATE TABLE `article_daily_stat` (
+  `id`             bigint   NOT NULL AUTO_INCREMENT,
+  `stat_date`      date     NOT NULL                 COMMENT '统计日期',
+  `article_id`     bigint   NOT NULL                 COMMENT '文章ID',
+  `view_count`     bigint   NOT NULL DEFAULT 0       COMMENT '文章浏览次数',
+  `visitor_count`  bigint   NOT NULL DEFAULT 0       COMMENT '文章去重访客数',
+  `duration_total` bigint   NOT NULL DEFAULT 0       COMMENT '累计阅读时长，毫秒',
+  `create_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`    datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_date_article` (`stat_date`, `article_id`),
+  KEY `idx_article_date` (`article_id`, `stat_date`),
+  KEY `idx_date_view` (`stat_date`, `view_count`)
+) COMMENT '文章每日聚合表';
+
+-- ---------------------------------------------------------
+-- 19. 标签每日点击聚合表
+-- ---------------------------------------------------------
+CREATE TABLE `tag_daily_stat` (
+  `id`            bigint   NOT NULL AUTO_INCREMENT,
+  `stat_date`     date     NOT NULL                 COMMENT '统计日期',
+  `tag_id`        bigint   NOT NULL                 COMMENT '标签ID',
+  `click_count`   bigint   NOT NULL DEFAULT 0       COMMENT '标签点击次数',
+  `visitor_count` bigint   NOT NULL DEFAULT 0       COMMENT '去重访客数',
+  `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_date_tag` (`stat_date`, `tag_id`),
+  KEY `idx_tag_date` (`tag_id`, `stat_date`),
+  KEY `idx_date_click` (`stat_date`, `click_count`)
+) COMMENT '标签每日点击聚合表';
+
+-- ---------------------------------------------------------
+-- 20. 合集每日点击聚合表
+-- ---------------------------------------------------------
+CREATE TABLE `collection_daily_stat` (
+  `id`            bigint   NOT NULL AUTO_INCREMENT,
+  `stat_date`     date     NOT NULL                 COMMENT '统计日期',
+  `collection_id` bigint   NOT NULL                 COMMENT '合集ID',
+  `click_count`   bigint   NOT NULL DEFAULT 0       COMMENT '合集点击次数',
+  `visitor_count` bigint   NOT NULL DEFAULT 0       COMMENT '去重访客数',
+  `create_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`   datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_date_collection` (`stat_date`, `collection_id`),
+  KEY `idx_collection_date` (`collection_id`, `stat_date`),
+  KEY `idx_date_click` (`stat_date`, `click_count`)
+) COMMENT '合集每日点击聚合表';
+
+-- ---------------------------------------------------------
+-- 21. 搜索关键词每日聚合表
+-- ---------------------------------------------------------
+CREATE TABLE `search_keyword_stat` (
+  `id`            bigint       NOT NULL AUTO_INCREMENT,
+  `stat_date`     date         NOT NULL                 COMMENT '统计日期',
+  `keyword`       varchar(200) NOT NULL                 COMMENT '搜索关键词',
+  `search_count`  bigint       NOT NULL DEFAULT 0       COMMENT '搜索次数',
+  `visitor_count` bigint       NOT NULL DEFAULT 0       COMMENT '去重访客数',
+  `create_time`   datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`   datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_date_keyword` (`stat_date`, `keyword`),
+  KEY `idx_keyword_date` (`keyword`, `stat_date`),
+  KEY `idx_date_search` (`stat_date`, `search_count`)
+) COMMENT '搜索关键词每日聚合表';
+
+-- AI 调用日志表（成本与可观测）
+CREATE TABLE IF NOT EXISTS `ai_call_log` (
+  `id`                BIGINT      NOT NULL AUTO_INCREMENT,
+  `scene`             VARCHAR(32) NOT NULL                COMMENT '调用场景：summary/tags/agent-topics/agent-draft',
+  `model`             VARCHAR(64)          DEFAULT NULL   COMMENT '模型，如 deepseek-chat',
+  `prompt_hash`       CHAR(64)             DEFAULT NULL   COMMENT '输入内容 SHA-256，用于缓存命中统计',
+  `cache_hit`         TINYINT              DEFAULT 0      COMMENT '是否命中缓存：0 否 1 是',
+  `success`           TINYINT              DEFAULT 0      COMMENT '是否成功：0 否(已降级) 1 是',
+  `latency_ms`        BIGINT               DEFAULT NULL   COMMENT '耗时毫秒（命中缓存为 0）',
+  `prompt_tokens`     INT                  DEFAULT NULL   COMMENT '输入 token',
+  `completion_tokens` INT                  DEFAULT NULL   COMMENT '输出 token',
+  `total_tokens`      INT                  DEFAULT NULL   COMMENT '总 token',
+  `step_no`           INT                  DEFAULT NULL   COMMENT 'Agent 任务内的步序（第几轮模型调用）；非 Agent 为空',
+  `tool_name`         VARCHAR(128)         DEFAULT NULL   COMMENT '该步模型请求调用的工具名（逗号分隔）；最终步为空',
+  `error_message`     VARCHAR(500)         DEFAULT NULL   COMMENT '失败或降级原因',
+  `create_time`       DATETIME             DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_scene_time` (`scene`, `create_time`),
+  KEY `idx_prompt_hash` (`prompt_hash`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='AI 调用日志';

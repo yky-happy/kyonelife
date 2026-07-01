@@ -1,3 +1,14 @@
+/* ===== 自托管字体（离线可用，不依赖会被墙的 Google Fonts） ===== */
+/* Inter：拉丁字母（与 teapro.top 一致） */
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("./assets/fonts/inter-400.woff") format("woff"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("./assets/fonts/inter-500.woff") format("woff"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("./assets/fonts/inter-600.woff") format("woff"); }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url("./assets/fonts/inter-700.woff") format("woff"); }
+/* Noto Sans SC：中文（teapro 的 --sans 字体栈中即含此字体；已按全站用字子集化） */
+@font-face { font-family: "Noto Sans SC"; font-style: normal; font-weight: 400; font-display: swap; src: url("./assets/fonts/noto-sans-sc-400.woff") format("woff"); }
+@font-face { font-family: "Noto Sans SC"; font-style: normal; font-weight: 500; font-display: swap; src: url("./assets/fonts/noto-sans-sc-500.woff") format("woff"); }
+@font-face { font-family: "Noto Sans SC"; font-style: normal; font-weight: 700; font-display: swap; src: url("./assets/fonts/noto-sans-sc-700.woff") format("woff"); }
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -5,27 +16,66 @@
 }
 
 :root {
-  --primary: #2f6df6;
-  --primary-light: #eef5ff;
-  --primary-hover: #1d4ed8;
-  --accent: #15b8a6;
-  --warm: #ff8a5b;
-  --sidebar-width: 220px;
-  --header-height: 64px;
-  --sidebar-bg: rgba(255, 255, 255, .86);
-  --active-bg: linear-gradient(135deg, #2f6df6 0%, #15b8a6 100%);
+  /* ===== 导航字体：拉丁=Inter，中文=Noto Sans SC（均自托管，全平台一致显示） ===== */
+  --font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* ===== 单一功能色：低饱和柔青（仅用于关键操作 / 激活强调，占比 <10%） ===== */
+  --accent: #4f8d83;
+  --accent-deep: #3f7268;
+  --accent-soft: #edf3f1;
+  --accent-line: #d7e6e2;
+
+  /* ===== 中性主调（低饱和石板灰，承担 90% 视觉面积） ===== */
+  --ink-strong: #1f2730;
+  --ink: #2c3540;
+  --text: #3a434f;
+  --text-muted: #8b94a1;
+  --text-faint: #aab2bd;
+
+  --line: #e9ebf0;
+  --line-soft: rgba(225, 229, 236, .7);
+
+  /* ===== 中性深色激活态（非功能色，不计入彩色预算） ===== */
+  --active-bg: #2b323d;
   --active-text: #ffffff;
-  --text: #263246;
-  --text-main: #142033;
-  --text-muted: #8a97ad;
-  --border: #e8edf6;
-  --main-bg: #f3f7fc;
-  --card-bg: rgba(255, 255, 255, .92);
+
+  --sidebar-width: 224px;
+  --header-height: 64px;
+
+  /* ===== 毛玻璃表面 ===== */
+  --main-bg: #eef0f4;
+  --sidebar-bg: rgba(255, 255, 255, .58);
+  --header-bg: rgba(255, 255, 255, .5);
+  --card-bg: rgba(255, 255, 255, .72);
+  --glass-bg: rgba(255, 255, 255, .5);
+
+  /* ===== 圆角：整体弱化尖锐感 ===== */
+  --radius-lg: 20px;
   --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 18px 48px rgba(20, 32, 51, .08), 0 1px 0 rgba(255, 255, 255, .8) inset;
-  --shadow-md: 0 22px 60px rgba(35, 73, 125, .14);
-  --ring: 0 0 0 4px rgba(47, 109, 246, .1);
+  --radius-sm: 11px;
+  --radius-pill: 999px;
+
+  --shadow: 0 1px 2px rgba(28, 37, 48, .04), 0 14px 38px rgba(28, 37, 48, .07);
+  --shadow-md: 0 18px 50px rgba(28, 37, 48, .1);
+  --ring: 0 0 0 3px rgba(79, 141, 131, .14);
+
+  /* ===== 覆盖 Element Plus 主色为低饱和柔青 ===== */
+  --el-color-primary: #4f8d83;
+  --el-color-primary-light-3: #7faaa2;
+  --el-color-primary-light-5: #a7c6c0;
+  --el-color-primary-light-7: #cfe0dd;
+  --el-color-primary-light-8: #e2edeb;
+  --el-color-primary-light-9: #eef5f3;
+  --el-color-primary-dark-2: #3f7268;
+  --el-border-radius-base: 11px;
+
+  /* ===== 兼容旧变量：统一映射到新的低饱和中性 / 柔青体系 ===== */
+  --primary: var(--accent);
+  --primary-hover: var(--accent-deep);
+  --primary-light: var(--accent-soft);
+  --text-main: var(--ink-strong);
+  --border: var(--line);
+  --warm: #c2954f;
 }
 
 html, body, #app {
@@ -33,9 +83,9 @@ html, body, #app {
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 18% 8%, rgba(47, 109, 246, .12), transparent 28%),
-    radial-gradient(circle at 86% 12%, rgba(21, 184, 166, .12), transparent 24%),
-    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+    radial-gradient(circle at 16% 4%, rgba(216, 208, 196, .28), transparent 30%),
+    radial-gradient(circle at 88% 6%, rgba(79, 141, 131, .08), transparent 26%),
+    linear-gradient(180deg, #f5f6f8 0%, #eceef2 100%);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -45,18 +95,20 @@ button, input, textarea {
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #c7d2e5; border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: #d2d7df; border-radius: 999px; }
 
 .page { min-height: 100%; }
 
+/* ===== 卡片：一个区域一个功能，用卡片做视觉分割 ===== */
 .page-card {
   position: relative;
   background: var(--card-bg) !important;
-  border: 1px solid rgba(232, 237, 246, .88);
-  border-radius: var(--radius) !important;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg) !important;
   box-shadow: var(--shadow) !important;
   padding: 22px 24px !important;
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .toolbar {
@@ -69,12 +121,14 @@ button, input, textarea {
 }
 
 .custom-table {
-  --el-table-header-bg-color: #f7faff;
-  --el-table-header-text-color: #607089;
-  --el-table-row-hover-bg-color: #f2f7ff;
-  border: 1px solid var(--border);
-  border-radius: 14px !important;
+  --el-table-header-bg-color: rgba(247, 248, 250, .8);
+  --el-table-header-text-color: #6c7686;
+  --el-table-row-hover-bg-color: rgba(79, 141, 131, .05);
+  --el-table-border-color: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius) !important;
   overflow: hidden !important;
+  background: transparent;
 }
 
 .pagination {
@@ -86,45 +140,51 @@ button, input, textarea {
 }
 
 .el-table .el-table__cell {
-  border-bottom-color: #eef3fb;
+  border-bottom-color: #eef0f4;
 }
 
+/* ===== 按钮：默认中性，主操作用低饱和柔青纯色（不再用高饱和渐变） ===== */
 .el-button {
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
 }
 
 .el-button--primary {
   border: none;
-  background: linear-gradient(135deg, #2f6df6 0%, #15b8a6 100%);
-  box-shadow: 0 10px 22px rgba(47, 109, 246, .2);
+  background: var(--accent);
+  box-shadow: 0 8px 20px rgba(79, 141, 131, .18);
 }
 
 .el-button--primary:hover,
 .el-button--primary:focus {
-  filter: brightness(1.03);
-  box-shadow: 0 12px 28px rgba(47, 109, 246, .24);
+  background: var(--accent-deep);
+  box-shadow: 0 10px 24px rgba(79, 141, 131, .24);
 }
 
 .el-input__wrapper,
 .el-textarea__inner,
 .el-select__wrapper {
-  border-radius: 10px;
-  box-shadow: 0 0 0 1px var(--border) inset;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px var(--line) inset;
 }
 
 .el-input__wrapper.is-focus,
 .el-textarea__inner:focus,
 .el-select__wrapper.is-focused {
-  box-shadow: 0 0 0 1px var(--primary) inset, var(--ring);
+  box-shadow: 0 0 0 1px var(--accent) inset, var(--ring);
 }
 
 .el-dialog {
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
+}
+
+.el-card {
+  border-radius: var(--radius-lg);
+  border-color: var(--line-soft);
 }
 
 .el-tag {
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-weight: 600;
 }
 
@@ -143,53 +203,67 @@ button, input, textarea {
   min-width: 54px;
   height: 30px;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   box-shadow: none;
   font-size: 13px;
   font-weight: 700;
 }
 
+/* 表格内联操作：统一低饱和，hover 才显主色，平时以中性为主 */
 .table-actions .el-button--primary.is-text {
-  color: #1d4ed8;
-  background: #eef5ff;
-  border-color: #cfe0ff;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
 }
 
 .table-actions .el-button--primary.is-text:hover {
   color: #ffffff;
-  background: linear-gradient(135deg, #2f6df6 0%, #15b8a6 100%);
+  background: var(--accent);
 }
 
 .table-actions .el-button--success.is-text {
-  color: #0f8f72;
-  background: #eafaf5;
-  border-color: #bfeee0;
+  color: #4a7a5f;
+  background: #eef4ef;
+  border-color: #d6e5da;
 }
 
 .table-actions .el-button--success.is-text:hover {
   color: #ffffff;
-  background: #15b8a6;
+  background: #5b9173;
 }
 
 .table-actions .el-button--warning.is-text {
-  color: #b76b13;
-  background: #fff4e6;
-  border-color: #ffd9a8;
+  color: #9a7440;
+  background: #f6f1e8;
+  border-color: #e7dcc6;
 }
 
 .table-actions .el-button--warning.is-text:hover {
   color: #ffffff;
-  background: #f59e0b;
+  background: #c2954f;
 }
 
 .table-actions .el-button--danger.is-text {
-  color: #d63838;
-  background: #fff0f0;
-  border-color: #ffd0d0;
+  color: #a85d5d;
+  background: #f6eded;
+  border-color: #e7d2d2;
 }
 
 .table-actions .el-button--danger.is-text:hover {
   color: #ffffff;
-  background: #ef4444;
+  background: #c06b6b;
+}
+
+/* ===== 全局去加粗：导航 / 标题 / 表头 / strong / Element Plus 统一为常规字重 ===== */
+body,
+body *,
+.sidebar,
+.sidebar *,
+h1, h2, h3, h4, h5, h6,
+strong, b, th,
+.el-button,
+.el-table th.el-table__cell,
+.el-tag {
+  font-weight: 400 !important;
 }

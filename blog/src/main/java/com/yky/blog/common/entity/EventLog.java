@@ -22,6 +22,7 @@ public class EventLog {
     private String pageUrl;
     private String referrer;
     private String ip;
+    private String ipLocation;
     private String userAgent;
     private String device;
     private String browser;

@@ -1,0 +1,111 @@
+<!-- @dsCard group="Pages" -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>方向③ 现代清爽 · 柔色卡片</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1f2330; --soft:#535b6e; --muted:#9aa1b2; --line:#eaecf2; --bg:#f5f7fb; --card:#fff;
+    --accent:#4f6ef2; --accent-soft:#eef2fe; --accent-2:#16c0a8;
+    --sans:"Inter","Noto Sans SC",system-ui,sans-serif; --r:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--soft);line-height:1.62;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(circle at 12% 0%,rgba(79,110,242,.07),transparent 32%),radial-gradient(circle at 92% 4%,rgba(22,192,168,.07),transparent 30%),var(--bg);min-height:100vh}
+  ::selection{background:var(--accent);color:#fff}
+  a{color:inherit;text-decoration:none}
+  .wrap{width:min(1160px,calc(100% - 48px));margin:0 auto}
+
+  .head{position:sticky;top:14px;z-index:20;display:flex;align-items:center;justify-content:space-between;
+    padding:13px 20px;margin-top:14px;border:1px solid rgba(255,255,255,.7);border-radius:16px;
+    background:rgba(255,255,255,.7);backdrop-filter:blur(18px);box-shadow:0 10px 30px rgba(40,50,80,.06)}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;color:var(--ink);font-size:18px}
+  .dot{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:800}
+  .nav{display:flex;gap:26px}
+  .nav a{font-size:14px;color:var(--soft);font-weight:500}.nav a:hover{color:var(--accent)}
+
+  .hero{padding:64px 0 40px;display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center}
+  .pill{display:inline-flex;gap:8px;align-items:center;font-size:12.5px;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:7px 15px;font-weight:600}
+  .hero h1{font-size:clamp(34px,4.6vw,52px);line-height:1.12;font-weight:800;color:var(--ink);letter-spacing:-1px;margin:20px 0 18px}
+  .hero h1 .u{background:linear-gradient(120deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{font-size:16.5px;color:var(--muted);max-width:46ch}
+  .acts{display:flex;gap:13px;margin-top:30px}
+  .btn{padding:12px 24px;border-radius:12px;font-size:14.5px;font-weight:600;cursor:pointer;transition:.22s;border:1px solid transparent}
+  .btn-p{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 14px 30px rgba(79,110,242,.28)}
+  .btn-p:hover{transform:translateY(-2px)}
+  .btn-g{background:var(--card);color:var(--ink);border-color:var(--line)}.btn-g:hover{border-color:var(--accent)}
+
+  /* 英雄右侧 bento */
+  .bento{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:14px}
+  .bt{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 12px 30px rgba(40,50,80,.05)}
+  .bt.big{grid-column:1/-1;background:linear-gradient(135deg,#4f6ef2,#16c0a8);color:#fff;border:none}
+  .bt .n{font-size:30px;font-weight:800;color:var(--ink);letter-spacing:-1px}
+  .bt.big .n{color:#fff;font-size:22px;font-weight:700;letter-spacing:0}
+  .bt .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .bt.big .l{color:rgba(255,255,255,.85)}
+
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin:48px 0 24px}
+  .sec-head h2{font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-.4px}
+  .sec-head a{font-size:14px;color:var(--accent);font-weight:600}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.28s;display:flex;flex-direction:column}
+  .card:hover{transform:translateY(-5px);box-shadow:0 26px 50px rgba(40,50,80,.12)}
+  .cv{height:150px;background:linear-gradient(135deg,#7d93f5,#9fb0fb);position:relative}
+  .card:nth-child(2) .cv{background:linear-gradient(135deg,#46c5b2,#8fe0d3)}
+  .card:nth-child(3) .cv{background:linear-gradient(135deg,#9a8cf0,#c3b8fa)}
+  .card:nth-child(4) .cv{background:linear-gradient(135deg,#f59f8c,#fbc4b3)}
+  .pin{position:absolute;top:12px;left:12px;font-size:11px;color:var(--accent);background:#fff;padding:4px 11px;border-radius:999px;font-weight:700}
+  .cb{padding:20px 22px;display:flex;flex-direction:column;flex:1}
+  .mt{display:flex;gap:12px;font-size:12.5px;color:var(--muted);margin-bottom:10px}
+  .cb h3{font-size:19px;font-weight:700;color:var(--ink);line-height:1.42}
+  .cb p{font-size:14px;color:var(--muted);margin-top:9px;flex:1}
+  .tags{display:flex;gap:8px;margin-top:15px}
+  .chip{font-size:12px;padding:4px 12px;border-radius:999px;background:#f3f5fa;color:var(--soft)}
+  .chip.c{background:var(--accent-soft);color:var(--accent);font-weight:600}
+
+  .more{display:flex;justify-content:center;margin-top:40px}
+  .foot{margin-top:44px;padding:38px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--muted);font-size:14px}
+  .foot b{color:var(--ink)}
+  @media(max-width:860px){.nav{display:none}.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="brand"><span class="dot">K</span> Kyonelife</div>
+      <nav class="nav"><a>首页</a><a>标签</a><a>合集</a><a>归档</a><a>关于</a></nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <span class="pill">● planet journal</span>
+        <h1>把日常里的微光,整理成<span class="u">再次出发</span>的文章。</h1>
+        <p>记录技术、生活与思考。愿每篇文章都像一次星际停靠——带着好奇,也带着一点柔软。</p>
+        <div class="acts"><a class="btn btn-p">阅读文章 →</a><a class="btn btn-g">查看归档</a></div>
+      </div>
+      <div class="bento">
+        <div class="bt big"><div class="n">写一点清醒,也写一点温柔。</div><div class="l">today's orbit</div></div>
+        <div class="bt"><div class="n">24</div><div class="l">已发布文章</div></div>
+        <div class="bt"><div class="n">3.6k</div><div class="l">累计阅读</div></div>
+      </div>
+    </section>
+
+    <div class="sec-head"><h2>最新文章</h2><a>按标签浏览 →</a></div>
+    <div class="grid">
+      <article class="card"><div class="cv"><span class="pin">置顶</span></div><div class="cb"><div class="mt"><span>2026.06.23</span><span>1.2k 阅读</span></div><h3>用 Redis 给博客做数据聚合缓存</h3><p>把热点数据前移到缓存层,聊聊聚合、过期与一致性的取舍。</p><div class="tags"><span class="chip c">后端</span><span class="chip">Redis</span></div></div></article>
+      <article class="card"><div class="cv"></div><div class="cb"><div class="mt"><span>2026.06.24</span><span>980 阅读</span></div><h3>从零搭建埋点系统的踩坑记录</h3><p>一套轻量埋点如何落地:采集、上报、清洗,以及那些半夜的 bug。</p><div class="tags"><span class="chip c">全栈</span><span class="chip">埋点</span></div></div></article>
+      <article class="card"><div class="cv"></div><div class="cb"><div class="mt"><span>2026.06.09</span><span>710 阅读</span></div><h3>MinIO 操作日志与运行日志分析</h3><p>对象存储的可观测性实践,把"发生了什么"变成可检索的日志。</p><div class="tags"><span class="chip c">运维</span><span class="chip">MinIO</span></div></div></article>
+      <article class="card"><div class="cv"></div><div class="cb"><div class="mt"><span>2026.06.02</span><span>560 阅读</span></div><h3>博客去同质化的最终改进方向</h3><p>当所有模板都长一个样,如何让博客重新拥有记忆点。</p><div class="tags"><span class="chip c">产品</span><span class="chip">设计</span></div></div></article>
+    </div>
+    <div class="more"><a class="btn btn-g">继续探索</a></div>
+
+    <footer class="foot"><span>守护一朵玫瑰,也记录每一次远行。</span><b>Kyonelife Blog</b></footer>
+  </div>
+</body>
+</html>

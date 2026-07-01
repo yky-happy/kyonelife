@@ -4,6 +4,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yky.blog.auth.dto.LoginDTO;
 import com.yky.blog.auth.service.AdminService;
+import com.yky.blog.auth.service.PermissionService;
+import com.yky.blog.auth.vo.AdminInfoVO;
 import com.yky.blog.auth.vo.LoginVO;
 import com.yky.blog.common.entity.Admin;
 import com.yky.blog.common.exception.BizException;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class AdminServiceImpl implements AdminService {
 
     private final AdminMapper adminMapper;
+    private final PermissionService permissionService;
 
     @Override
     public LoginVO login(LoginDTO dto) {
@@ -37,6 +40,8 @@ public class AdminServiceImpl implements AdminService {
         }
 
         StpUtil.login(admin.getId());
+        // 登录时清除旧的权限缓存，确保角色变更后即时生效
+        permissionService.clearCache(admin.getId());
 
         return LoginVO.builder()
                 .token(StpUtil.getTokenValue())
@@ -47,6 +52,27 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void logout() {
+        Object adminId = StpUtil.getLoginIdDefaultNull();
+        if (adminId != null) {
+            permissionService.clearCache(adminId);
+        }
         StpUtil.logout();
+    }
+
+    @Override
+    public AdminInfoVO getCurrentInfo() {
+        Object adminId = StpUtil.getLoginId();
+        Admin admin = adminMapper.selectById(Long.valueOf(String.valueOf(adminId)));
+        if (admin == null) {
+            throw new BizException("管理员不存在");
+        }
+        return AdminInfoVO.builder()
+                .id(admin.getId())
+                .username(admin.getUsername())
+                .nickname(admin.getNickname())
+                .roles(permissionService.listRoles(adminId))
+                .permissions(permissionService.listPermissions(adminId))
+                .menus(permissionService.listMenuTree(adminId))
+                .build();
     }
 }

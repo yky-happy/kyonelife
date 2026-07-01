@@ -1,5 +1,6 @@
 package com.yky.blog.admin.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yky.blog.admin.dto.ArticleSaveDTO;
 import com.yky.blog.admin.dto.ArticleStatusDTO;
@@ -23,6 +24,7 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @Operation(summary = "分页查询文章")
+    @SaCheckPermission("article:list")
     @GetMapping("/page")
     public Result<IPage<ArticleVO>> page(@RequestParam(defaultValue = "1") int page,
                                          @RequestParam(defaultValue = "10") int size,
@@ -32,12 +34,14 @@ public class ArticleController {
     }
 
     @Operation(summary = "查询文章详情")
+    @SaCheckPermission("article:list")
     @GetMapping("/{id}")
     public Result<ArticleDetailVO> detail(@PathVariable Long id) {
         return Result.success(articleService.getArticleDetail(id));
     }
 
     @Operation(summary = "新增文章")
+    @SaCheckPermission("article:add")
     @OperationLogRecord(module = "文章管理", operation = "新增文章")
     @PostMapping
     public Result<Long> save(@Valid @RequestBody ArticleSaveDTO dto) {
@@ -45,6 +49,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "编辑文章")
+    @SaCheckPermission("article:edit")
     @OperationLogRecord(module = "文章管理", operation = "编辑文章")
     @PutMapping("/{id}")
     public Result<Void> update(@PathVariable Long id, @Valid @RequestBody ArticleSaveDTO dto) {
@@ -53,6 +58,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "更新文章状态")
+    @SaCheckPermission("article:edit")
     @OperationLogRecord(module = "文章管理", operation = "更新文章状态")
     @PatchMapping("/{id}/status")
     public Result<Void> updateStatus(@PathVariable Long id, @Valid @RequestBody ArticleStatusDTO dto) {
@@ -61,6 +67,7 @@ public class ArticleController {
     }
 
     @Operation(summary = "删除文章")
+    @SaCheckPermission("article:delete")
     @OperationLogRecord(module = "文章管理", operation = "删除文章")
     @DeleteMapping("/{id}")
     public Result<Void> remove(@PathVariable Long id) {

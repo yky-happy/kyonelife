@@ -5,6 +5,15 @@ const request = axios.create({
   timeout: 10000,
 })
 
+// 读者登录态：附带 user-token（与后台 satoken 隔离）
+request.interceptors.request.use((config) => {
+  const token = localStorage.getItem('kyonelife_user_token')
+  if (token) {
+    config.headers.set('user-token', token)
+  }
+  return config
+})
+
 request.interceptors.response.use((response) => {
   const result = response.data
   if (result && typeof result === 'object' && 'code' in result) {
