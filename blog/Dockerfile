@@ -10,6 +10,9 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /build
 
+# 阿里云 Maven 镜像，加速国内服务器拉依赖
+COPY docker-maven-settings.xml /root/.m2/settings.xml
+
 # 先只拷贝 pom：依赖下载与源码改动解耦，源码变更不必重新拉依赖
 COPY pom.xml .
 RUN mvn -q -B dependency:go-offline
