@@ -11,6 +11,23 @@ spring:
       host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD}
+  # 邮箱验证码发送（QQ 邮箱 SMTP；MAIL_PASSWORD 填「授权码」而非登录密码）。
+  # host 有默认值 => JavaMailSender bean 一定会创建，应用可正常启动；
+  # 未配 MAIL_USERNAME/MAIL_PASSWORD 时仅“发送验证码”会失败，不影响其它功能。
+  mail:
+    host: ${MAIL_HOST:smtp.qq.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
 
 minio:
   endpoint: ${MINIO_ENDPOINT:http://minio:9000}
