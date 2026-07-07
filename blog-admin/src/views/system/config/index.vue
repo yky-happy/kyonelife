@@ -21,8 +21,25 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="Logo 地址">
-                <el-input v-model="form.logo" placeholder="图片 URL" />
+              <el-form-item label="网站 Logo">
+                <div class="avatar-upload">
+                  <el-image
+                    v-if="form.logo"
+                    :src="form.logo"
+                    fit="contain"
+                    class="logo-preview"
+                  />
+                  <div class="avatar-actions">
+                    <el-upload
+                      :show-file-list="false"
+                      :http-request="handleLogoUpload"
+                      accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                    >
+                      <el-button :loading="logoUploading" :icon="Upload">上传 Logo</el-button>
+                    </el-upload>
+                    <el-input v-model="form.logo" placeholder="上传后自动回填，也可手动填写图片 URL" />
+                  </div>
+                </div>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -107,6 +124,7 @@ import { getConfig, updateConfig } from '@/api/config'
 
 const saving = ref(false)
 const avatarUploading = ref(false)
+const logoUploading = ref(false)
 
 const form = reactive({
   siteName: '', logo: '', summary: '', author: '', authorAvatar: '',
@@ -146,6 +164,17 @@ async function handleAuthorAvatarUpload(options: UploadRequestOptions) {
     avatarUploading.value = false
   }
 }
+
+async function handleLogoUpload(options: UploadRequestOptions) {
+  logoUploading.value = true
+  try {
+    const res = await uploadImage(options.file, 'logo')
+    form.logo = res.data.url
+    ElMessage.success('Logo 上传成功')
+  } finally {
+    logoUploading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -167,5 +196,13 @@ async function handleAuthorAvatarUpload(options: UploadRequestOptions) {
   flex: 1;
   flex-direction: column;
   gap: 8px;
+}
+.logo-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  flex-shrink: 0;
 }
 </style>
