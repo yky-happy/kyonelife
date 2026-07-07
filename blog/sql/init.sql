@@ -6,6 +6,9 @@
 CREATE DATABASE IF NOT EXISTS kyonelife DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE kyonelife;
 
+-- 强制本次导入会话用 utf8mb4，避免容器内 mysql 客户端默认 latin1 导致中文双重编码乱码
+SET NAMES utf8mb4;
+
 -- ---------------------------------------------------------
 -- 1. 前台用户表（手机号验证码登录）
 -- ---------------------------------------------------------
@@ -282,6 +285,40 @@ CREATE TABLE `article_tag` (
   UNIQUE KEY `uk_article_tag` (`article_id`, `tag_id`),
   KEY `idx_tag_id` (`tag_id`)
 ) COMMENT '文章标签关联表';
+
+-- ---------------------------------------------------------
+-- 11.5 评论表 / 评论点赞表
+-- ---------------------------------------------------------
+CREATE TABLE `comment` (
+  `id`          bigint        NOT NULL AUTO_INCREMENT     COMMENT '评论ID',
+  `article_id`  bigint        NOT NULL                    COMMENT '所属文章ID',
+  `parent_id`   bigint        DEFAULT NULL                COMMENT '父评论ID，NULL/0 表示顶级评论',
+  `user_id`     bigint        NOT NULL                    COMMENT '评论用户ID',
+  `content`     varchar(1000) NOT NULL                    COMMENT '评论内容',
+  `status`      tinyint       NOT NULL DEFAULT 1          COMMENT '状态：1 正常 / 0 隐藏',
+  `create_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_article_id` (`article_id`),
+  KEY `idx_parent_id` (`parent_id`)
+) COMMENT '文章评论表';
+
+CREATE TABLE `comment_like` (
+  `id`          bigint      NOT NULL AUTO_INCREMENT       COMMENT '主键',
+  `comment_id`  bigint      NOT NULL                      COMMENT '评论ID',
+  `visitor_id`  varchar(64) NOT NULL                      COMMENT '访客标识',
+  `create_time` datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '点赞时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_comment_visitor` (`comment_id`, `visitor_id`)
+) COMMENT '评论点赞表';
+
+CREATE TABLE `like_record` (
+  `id`          bigint      NOT NULL AUTO_INCREMENT       COMMENT '主键',
+  `article_id`  bigint      NOT NULL                      COMMENT '文章ID',
+  `visitor_id`  varchar(64) NOT NULL                      COMMENT '访客标识',
+  `create_time` datetime    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '点赞时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_article_visitor` (`article_id`, `visitor_id`)
+) COMMENT '文章点赞记录表';
 
 -- ---------------------------------------------------------
 -- 12. 轮播图表（文章轮播数为 0 时展示）
