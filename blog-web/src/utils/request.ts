@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+// 生产不设置 VITE_API_BASE_URL，走同源相对路径（由 nginx 反代 /api 到后端）；
+// 本地开发用 .env.development 里的 http://localhost:8080 直连后端。
 const request = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '',
   timeout: 10000,
 })
 

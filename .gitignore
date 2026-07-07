@@ -2,3 +2,6 @@ docker-data/
 blog/logs/
 # 部署密钥文件（仅提交 .env.example 模板）
 .env
+# HTTPS 私钥/证书不进版本库（仅保留目录说明）
+deploy/nginx/certs/*
+!deploy/nginx/certs/README.md

@@ -1,0 +1,115 @@
+# =========================================================
+# kyonelife 网关（唯一对公网开放的容器）
+#   - 读者端 blog-web        => https://${DOMAIN}          (静态 + 反代 /api、/minio)
+#   - 管理后台 blog-admin    => https://${ADMIN_DOMAIN}    (静态 + 反代 /api、/admin、Knife4j 文档)
+#   - 后端 blog / mysql / redis / minio 均只在内网，不暴露公网
+#
+# 本文件是 nginx 官方镜像的模板：容器启动时 envsubst 会用 .env 里的
+# ${DOMAIN} / ${ADMIN_DOMAIN} 替换后落地到 /etc/nginx/conf.d/kyonelife.conf。
+# nginx 自身变量写作 $host / $uri（无花括号），不会被替换。
+# =========================================================
+
+# 上传/大响应放宽到与后端 multipart 上限一致（100MB）
+client_max_body_size 100m;
+
+# ---------- HTTP：放行 ACME 证书校验，其余一律跳转 HTTPS ----------
+server {
+    listen 80;
+    listen [::]:80;
+    server_name ${DOMAIN} ${ADMIN_DOMAIN};
+
+    # Let's Encrypt / certbot webroot 校验（用腾讯云免费证书时此目录为空也无妨）
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# ---------- 读者端：https://${DOMAIN} ----------
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name ${DOMAIN};
+
+    ssl_certificate     /etc/nginx/certs/main.crt;
+    ssl_certificate_key /etc/nginx/certs/main.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    # 读者端静态资源（由 web_dist 卷挂载）
+    root /usr/share/nginx/web;
+    index index.html;
+
+    # 公开接口 => 后端
+    location /api/ {
+        proxy_pass http://blog:8080;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # MinIO 图片：后端把图片 URL 拼成 https://${DOMAIN}/minio/<bucket>/<obj>
+    # 这里剥掉 /minio/ 前缀转发给 MinIO（注意 proxy_pass 末尾的斜杠）
+    location /minio/ {
+        proxy_pass http://minio:9000/;
+        proxy_set_header Host $host;
+    }
+
+    # 单页应用：其余路径回退到 index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+
+# ---------- 管理后台：https://${ADMIN_DOMAIN} ----------
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name ${ADMIN_DOMAIN};
+
+    ssl_certificate     /etc/nginx/certs/admin.crt;
+    ssl_certificate_key /etc/nginx/certs/admin.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
+
+    root /usr/share/nginx/admin;
+    index index.html;
+
+    # 后台接口（/admin/*）与部分公共接口（/api/*）都走后端
+    location /api/ {
+        proxy_pass http://blog:8080;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location /admin/ {
+        proxy_pass http://blog:8080;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 后台里的图片也可能引用 /minio/
+    location /minio/ {
+        proxy_pass http://minio:9000/;
+        proxy_set_header Host $host;
+    }
+
+    # Knife4j 接口文档（后台“接口文档”链接指向 /doc.html）
+    location ~ ^/(doc\.html|webjars|v3|swagger-resources|favicon\.ico) {
+        proxy_pass http://blog:8080;
+        proxy_set_header Host $host;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

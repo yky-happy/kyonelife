@@ -60,7 +60,7 @@
           </div>
           <div class="sys-row">
             <span class="sys-key">接口文档</span>
-            <a class="sys-link" href="http://localhost:8080/doc.html" target="_blank">Knife4j 文档 →</a>
+            <a class="sys-link" :href="`${apiBase}/doc.html`" target="_blank">Knife4j 文档 →</a>
           </div>
         </div>
       </div>
@@ -71,6 +71,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getDashboardStats } from '@/api/dashboard'
+
+// 生产走同源（apiBase 为空 → /doc.html 由 nginx 反代到后端）；开发指向 localhost:8080
+const apiBase = import.meta.env.VITE_API_BASE_URL ?? ''
 
 const stats = ref([
   { label: '文章总数',  value: '--' as string | number, icon: 'Document',      color: '#2f6df6', bg: '#eef5ff', trend: 0 },
