@@ -168,7 +168,7 @@ async function handleAuthorAvatarUpload(options: UploadRequestOptions) {
 async function handleLogoUpload(options: UploadRequestOptions) {
   logoUploading.value = true
   try {
-    const res = await uploadImage(options.file, 'logo')
+    const res = await uploadImage(options.file, 'config')
     form.logo = res.data.url
     ElMessage.success('Logo 上传成功')
   } finally {
