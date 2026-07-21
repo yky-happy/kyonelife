@@ -1,5 +1,13 @@
 # kyonelife · 数据驱动的智能内容平台
 
+## 🔗 在线体验
+
+| | 地址 | 说明 |
+|---|---|---|
+| **读者端** | https://kyonelife.cn | 文章 / 合集 / 标签 / 评论点赞 / 手机验证码登录 |
+| **管理后台** | https://admin.kyonelife.cn | 访客只读账号 `guest` / `guest123`：可浏览全部页面与数据看板，所有增删改由后端 `@SaCheckPermission` 拦截 |
+
+
 > 一个把普通博客升级为「数据驱动 + AI 赋能」内容平台的全栈项目：埋点采集用户行为 → Redis Stream 异步落库 → 每日聚合出热门榜 → AI 基于真实数据做选题和创作 → 人工确认后发布，形成 **「数据 → AI 内容 → 再埋点」** 闭环。
 
 后端 Spring Boot 3 + Java 21，前台/后台各一个 Vue 3 应用，一条 `docker compose up` 即可拉起全部依赖。
