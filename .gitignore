@@ -5,3 +5,14 @@ blog/logs/
 # HTTPS 私钥/证书不进版本库（仅保留目录说明）
 deploy/nginx/certs/*
 !deploy/nginx/certs/README.md
+
+# ---- 个人学习/规划笔记与本地产物：保持面试仓库整洁，不进版本库 ----
+*.log
+docs/
+bug/
+技术文章/
+generated_assets/
+学习计划.md
+秋招备考计划-20天.md
+AI第二层-*.md
+MinIO-操作日志-*.md
